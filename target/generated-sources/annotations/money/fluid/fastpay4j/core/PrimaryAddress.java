@@ -167,7 +167,7 @@ public final class PrimaryAddress extends Ids._PrimaryAddress {
    * Creates a builder for {@link PrimaryAddress PrimaryAddress}.
    * <pre>
    * PrimaryAddress.builder()
-   *    .value(money.fluid.fp4j.core.keys.PublicKey) // required {@link PrimaryAddress#value() value}
+   *    .value(money.fluid.fastpay4j.core.keys.PublicKey) // required {@link PrimaryAddress#value() value}
    *    .build();
    * </pre>
    * @return A new PrimaryAddress builder

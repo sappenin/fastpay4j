@@ -8,7 +8,6 @@ import reactor.netty.tcp.TcpClient;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Service
 public class ClientManagementService {
 
   private static Map<String, TcpClient> ipToTcpClientMap = new ConcurrentHashMap<>();

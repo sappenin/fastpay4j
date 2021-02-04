@@ -1,4 +1,4 @@
-package money.fluid.fastpay4j.fp4jparent;
+package money.fluid.fastpay4j;
 
 import com.google.common.io.BaseEncoding;
 import money.fluid.fastpay4j.tcp.client.ClientHandshakeState;
@@ -24,17 +24,17 @@ import java.util.concurrent.atomic.AtomicReference;
   TcpClientConfig.class,
   TcpServerConfig.class
 })
-public class Fp4jParentApplication implements CommandLineRunner {
+public class Fastpay4jApplication implements CommandLineRunner {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
   private final ClientManagementService clientManagementService;
 
-  public Fp4jParentApplication(ClientManagementService clientManagementService) {
+  public Fastpay4jApplication(ClientManagementService clientManagementService) {
     this.clientManagementService = clientManagementService;
   }
 
   public static void main(String[] args) {
-    SpringApplication.run(Fp4jParentApplication.class, args);
+    SpringApplication.run(Fastpay4jApplication.class, args);
 
 //    GreetingWebClient gwc = new GreetingWebClient();
 //    System.out.println(gwc.getResult());
@@ -43,6 +43,12 @@ public class Fp4jParentApplication implements CommandLineRunner {
 
   @Override
   public void run(String... args) {
+
+    logger.info("EXECUTING : command line runner");
+    for (int i = 0; i < args.length; ++i) {
+      logger.info("args[{}]: {}", i, args[i]);
+    }
+
     clientManagementService.retrieveClient("localhost")
       .switchIfEmpty(clientManagementService.addClient("localhost"))
       .flatMap(TcpClient::connect)

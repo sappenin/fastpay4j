@@ -152,7 +152,7 @@ public final class ImmutableEd25519PublicKey implements Ed25519PublicKey {
     }
 
     /**
-     * Fill a builder with attribute values from the provided {@code money.fluid.fp4j.core.keys.PublicKey} instance.
+     * Fill a builder with attribute values from the provided {@code money.fluid.fastpay4j.core.keys.PublicKey} instance.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */
@@ -164,7 +164,7 @@ public final class ImmutableEd25519PublicKey implements Ed25519PublicKey {
     }
 
     /**
-     * Fill a builder with attribute values from the provided {@code money.fluid.fp4j.core.keys.Ed25519PublicKey} instance.
+     * Fill a builder with attribute values from the provided {@code money.fluid.fastpay4j.core.keys.Ed25519PublicKey} instance.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */

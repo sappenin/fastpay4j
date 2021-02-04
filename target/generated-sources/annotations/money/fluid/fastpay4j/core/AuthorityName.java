@@ -167,7 +167,7 @@ public final class AuthorityName extends Ids._AuthorityName {
    * Creates a builder for {@link AuthorityName AuthorityName}.
    * <pre>
    * AuthorityName.builder()
-   *    .value(money.fluid.fp4j.core.keys.PublicKey) // required {@link AuthorityName#value() value}
+   *    .value(money.fluid.fastpay4j.core.keys.PublicKey) // required {@link AuthorityName#value() value}
    *    .build();
    * </pre>
    * @return A new AuthorityName builder

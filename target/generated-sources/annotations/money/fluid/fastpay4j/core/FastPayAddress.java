@@ -167,7 +167,7 @@ public final class FastPayAddress extends Ids._FastPayAddress {
    * Creates a builder for {@link FastPayAddress FastPayAddress}.
    * <pre>
    * FastPayAddress.builder()
-   *    .value(money.fluid.fp4j.core.keys.PublicKey) // required {@link FastPayAddress#value() value}
+   *    .value(money.fluid.fastpay4j.core.keys.PublicKey) // required {@link FastPayAddress#value() value}
    *    .build();
    * </pre>
    * @return A new FastPayAddress builder

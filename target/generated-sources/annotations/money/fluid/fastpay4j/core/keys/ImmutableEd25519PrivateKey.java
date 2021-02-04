@@ -152,7 +152,7 @@ public final class ImmutableEd25519PrivateKey implements Ed25519PrivateKey {
     }
 
     /**
-     * Fill a builder with attribute values from the provided {@code money.fluid.fp4j.core.keys.PrivateKey} instance.
+     * Fill a builder with attribute values from the provided {@code money.fluid.fastpay4j.core.keys.PrivateKey} instance.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */
@@ -164,7 +164,7 @@ public final class ImmutableEd25519PrivateKey implements Ed25519PrivateKey {
     }
 
     /**
-     * Fill a builder with attribute values from the provided {@code money.fluid.fp4j.core.keys.Ed25519PrivateKey} instance.
+     * Fill a builder with attribute values from the provided {@code money.fluid.fastpay4j.core.keys.Ed25519PrivateKey} instance.
      * @param instance The instance from which to copy values
      * @return {@code this} builder for use in a chained invocation
      */

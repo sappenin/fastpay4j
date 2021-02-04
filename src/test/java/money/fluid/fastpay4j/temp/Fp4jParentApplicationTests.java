@@ -1,4 +1,4 @@
-package money.fluid.fastpay4j.fp4jparent;
+package money.fluid.fastpay4j.temp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
