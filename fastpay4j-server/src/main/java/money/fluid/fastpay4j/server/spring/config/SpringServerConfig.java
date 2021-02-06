@@ -29,16 +29,16 @@ public class SpringServerConfig implements ApplicationListener {
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-  @Autowired
-  private ApplicationContext applicationContext;
-
+//  @Autowired
+//  private ApplicationContext applicationContext;
+//
   @Autowired
   Supplier<ServerSettings> serverSettingsSupplier;
 
-  @Bean
-  Supplier<ServerSettings> serverSettingsSupplier() {
-    return () -> applicationContext.getBean(ServerSettings.class);
-  }
+//  @Bean
+//  Supplier<ServerSettings> serverSettingsSupplier() {
+//    return () -> applicationContext.getBean(ServerSettings.class);
+//  }
 
   /**
    * Handle an application event.

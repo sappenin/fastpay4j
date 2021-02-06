@@ -1,11 +1,13 @@
 package money.fluid.fastpay4j;
 
 import com.google.common.io.BaseEncoding;
+import money.fluid.fastpay4j.server.settings.ServerSettings;
 import money.fluid.fastpay4j.server.spring.config.SpringServerConfig;
 import money.fluid.fastpay4j.tcp.client.ClientHandshakeState;
 import money.fluid.fastpay4j.tcp.client.ClientManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -20,6 +22,7 @@ import reactor.util.retry.RetrySpec;
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 
 @SpringBootApplication
 @Import(SpringServerConfig.class)
@@ -49,6 +52,17 @@ public class Fastpay4jApplication implements CommandLineRunner {
     return new CountDownLatch(1);
   }
 
+  @Autowired
+  private ApplicationContext applicationContext;
+
+  @Autowired
+  Supplier<ServerSettings> serverSettingsSupplier;
+
+  @Bean
+  Supplier<ServerSettings> serverSettingsSupplier() {
+    return () -> applicationContext.getBean(ServerSettings.class);
+  }
+
   @Override
   public void run(String... args) {
 
@@ -57,8 +71,11 @@ public class Fastpay4jApplication implements CommandLineRunner {
       LOGGER.info("args[{}]: {}", i, args[i]);
     }
 
-    clientManagementService.retrieveClient("localhost")
-      .switchIfEmpty(clientManagementService.addClient("localhost"))
+    final ServerSettings serverSettings = serverSettingsSupplier.get();
+    clientManagementService.retrieveClient(serverSettings.authority().host(), serverSettings.authority().basePort())
+      .switchIfEmpty(
+        clientManagementService.addClient(serverSettings.authority().host(), serverSettings.authority().basePort())
+      )
       .flatMap(TcpClient::connect)
       .retryWhen(RetrySpec.backoff(3L, Duration.ofSeconds(1)))
       .flatMap(this::handleHandshake)

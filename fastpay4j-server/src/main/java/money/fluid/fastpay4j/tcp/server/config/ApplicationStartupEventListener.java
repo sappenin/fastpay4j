@@ -36,7 +36,7 @@ public class ApplicationStartupEventListener {
   private void startTcpServer() {
     // TODO: Depending on the number of shards specified via the command-line, construct that many TCP servers.
 
-    logger.info("Starting TCP Server on port 7654 ...");
+    logger.info("Starting TCP Server on port {} ...", serverSettings.get().authority().basePort());
     tcpServer.bindNow();
   }
 

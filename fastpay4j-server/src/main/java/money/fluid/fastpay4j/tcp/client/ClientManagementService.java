@@ -1,7 +1,6 @@
 package money.fluid.fastpay4j.tcp.client;
 
 import io.netty.channel.ChannelOption;
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 import reactor.netty.tcp.TcpClient;
 
@@ -12,19 +11,19 @@ public class ClientManagementService {
 
   private static Map<String, TcpClient> ipToTcpClientMap = new ConcurrentHashMap<>();
 
-  public Mono<TcpClient> addClient(String ip) {
+  public Mono<TcpClient> addClient(String host, int port) {
     TcpClient client = TcpClient.create()
-      .host("localhost")
-      .port(7654)
+      .host(host)
+      .port(port)
       .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 3000)
       .wiretap(true);
 
-    ipToTcpClientMap.put(ip, client);
+    ipToTcpClientMap.put(host + ":" + port, client);
     return Mono.just(client);
   }
 
-  public Mono<TcpClient> retrieveClient(String ip) {
-    TcpClient client = ipToTcpClientMap.get(ip);
+  public Mono<TcpClient> retrieveClient(String host, int port) {
+    TcpClient client = ipToTcpClientMap.get(host + ":" + port);
 
     if (client == null) {
       return Mono.empty();
