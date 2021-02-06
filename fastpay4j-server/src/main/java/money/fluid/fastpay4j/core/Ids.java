@@ -31,22 +31,6 @@ public class Ids {
   }
 
   /**
-   * A wrapped {@link PublicKey} representing an address for a FastPay account.
-   */
-  @Value.Immutable(intern = true)
-  @Wrapped
-  @JsonSerialize(as = FastPayAddress.class)
-  @JsonDeserialize(as = FastPayAddress.class)
-  abstract static class _FastPayAddress extends Wrapper<PublicKey> implements Serializable {
-
-    @Override
-    public String toString() {
-      return this.value().toString();
-    }
-
-  }
-
-  /**
    * A wrapped {@link PublicKey} representing the name of an Authority.l
    */
   @Value.Immutable(intern = true)

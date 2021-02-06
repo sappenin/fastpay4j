@@ -1,17 +1,13 @@
 package money.fluid.fastpay4j.core.keys;
 
-import money.fluid.fastpay4j.core.keys.ImmutableEd25519PublicKey.Builder;
 import org.immutables.value.Value;
-import org.immutables.value.Value.Default;
 import org.immutables.value.Value.Derived;
 
 import java.util.Base64;
 
-
 /**
- * A private key.
+ * An ed25519 public key.
  */
-@Value.Immutable
 public interface Ed25519PublicKey extends PublicKey {
 
   /**
@@ -19,19 +15,30 @@ public interface Ed25519PublicKey extends PublicKey {
    *
    * @return A Builder.
    */
-  static Builder builder() {
-    return ImmutableEd25519PublicKey.builder();
+  static ImmutableDefaultEd25519PublicKey.Builder builder() {
+    return ImmutableDefaultEd25519PublicKey.builder();
   }
 
-  @Override
-  @Default
-  default int compareTo(PublicKey publicKey) {
-    throw new RuntimeException("Not yet implemented");
-  }
+  /**
+   * To satisfy immutables.
+   */
+  @Value.Immutable
+  abstract class DefaultEd25519PublicKey implements Ed25519PublicKey {
 
-  @Override
-  @Derived
-  default String asBase64() {
-    return Base64.getEncoder().encodeToString(this.bytes());
+    @Override
+    @Derived
+    public String asBase64() {
+      return Base64.getEncoder().encodeToString(this.bytes());
+    }
+
+    @Override
+    public int compareTo(PublicKey publicKey) {
+      return publicKey.toString().compareTo(this.toString());
+    }
+
+    @Override
+    public String toString() {
+      return this.asBase64();
+    }
   }
 }

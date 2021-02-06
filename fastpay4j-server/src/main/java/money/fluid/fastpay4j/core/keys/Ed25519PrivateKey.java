@@ -1,16 +1,14 @@
 package money.fluid.fastpay4j.core.keys;
 
-import money.fluid.fastpay4j.core.keys.ImmutableEd25519PrivateKey.Builder;
 import org.immutables.value.Value;
-import org.immutables.value.Value.Default;
-import org.immutables.value.Value.Derived;
+import org.immutables.value.Value.Lazy;
+import org.immutables.value.Value.Redacted;
 
 import java.util.Base64;
 
 /**
  * A private key.
  */
-@Value.Immutable
 public interface Ed25519PrivateKey extends PrivateKey {
 
   /**
@@ -18,19 +16,36 @@ public interface Ed25519PrivateKey extends PrivateKey {
    *
    * @return A Builder.
    */
-  static Builder builder() {
-    return ImmutableEd25519PrivateKey.builder();
+  static ImmutableDefaultEd25519PrivateKey.Builder builder() {
+    return ImmutableDefaultEd25519PrivateKey.builder();
   }
 
-  @Override
-  @Default
-  default int compareTo(PrivateKey privateKey) {
-    throw new RuntimeException("Not yet implemented");
-  }
+  /**
+   * To satisfy immutables.
+   */
+  @Value.Immutable
+  abstract class DefaultEd25519PrivateKey implements Ed25519PrivateKey {
 
-  @Override
-  @Derived
-  default String asBase64() {
-    return Base64.getEncoder().encodeToString(this.bytes());
+    /**
+     * The bytes of this private key.
+     *
+     * @return A byte array.
+     */
+    @Override
+    @Redacted
+    public abstract byte[] bytes();
+
+    @Override
+    @Lazy
+    @Redacted
+    public String asBase64() {
+      return Base64.getEncoder().encodeToString(this.bytes());
+    }
+
+    @Override
+    public int compareTo(PrivateKey privateKey) {
+      return privateKey.toString().compareTo(this.toString());
+    }
+
   }
 }

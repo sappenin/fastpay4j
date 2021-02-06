@@ -1,7 +1,5 @@
 package money.fluid.fastpay4j.core.keys;
 
-import java.util.Base64;
-
 /**
  * A private key.
  */
@@ -19,7 +17,5 @@ public interface PrivateKey extends Comparable<PrivateKey> {
    *
    * @return
    */
-  default String asBase64() {
-    return Base64.getEncoder().encodeToString(this.bytes());
-  }
+  String asBase64();
 }

@@ -1,10 +1,9 @@
 package money.fluid.fastpay4j;
 
 import com.google.common.io.BaseEncoding;
+import money.fluid.fastpay4j.server.spring.config.SpringServerConfig;
 import money.fluid.fastpay4j.tcp.client.ClientHandshakeState;
 import money.fluid.fastpay4j.tcp.client.ClientManagementService;
-import money.fluid.fastpay4j.tcp.client.config.TcpClientConfig;
-import money.fluid.fastpay4j.tcp.server.config.TcpServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -23,10 +22,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SpringBootApplication
-@Import( {
-  TcpClientConfig.class,
-  TcpServerConfig.class
-})
+@Import(SpringServerConfig.class)
 public class Fastpay4jApplication implements CommandLineRunner {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(Fastpay4jApplication.class);
