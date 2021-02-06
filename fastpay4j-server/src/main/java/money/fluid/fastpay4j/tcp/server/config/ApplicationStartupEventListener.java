@@ -23,11 +23,13 @@ public class ApplicationStartupEventListener {
 
   @EventListener
   public void onApplicationEvent(ContextRefreshedEvent event) {
-    logger.info("Starting TCP Server on port 7654 ...");
     startTcpServer(); // TODO: Toggle based on CLI input?
   }
 
   private void startTcpServer() {
+    // TODO: Depending on the number of shards specified via the command-line, construct that many TCP servers.
+
+    logger.info("Starting TCP Server on port 7654 ...");
     tcpServer.bindNow();
   }
 

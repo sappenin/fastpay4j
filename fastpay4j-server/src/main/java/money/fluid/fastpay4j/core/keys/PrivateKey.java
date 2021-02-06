@@ -16,9 +16,10 @@ public interface PrivateKey extends Comparable<PrivateKey> {
 
   /**
    * Accessor for a Base64-encoded string representation of this key.
+   *
    * @return
    */
-  default String asBase64(){
+  default String asBase64() {
     return Base64.getEncoder().encodeToString(this.bytes());
   }
 }

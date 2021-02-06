@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import reactor.core.publisher.Mono;
 import reactor.netty.Connection;
@@ -17,6 +19,7 @@ import reactor.netty.tcp.TcpClient;
 import reactor.util.retry.RetrySpec;
 
 import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicReference;
 
 @SpringBootApplication
@@ -26,27 +29,36 @@ import java.util.concurrent.atomic.AtomicReference;
 })
 public class Fastpay4jApplication implements CommandLineRunner {
 
-  private final Logger logger = LoggerFactory.getLogger(this.getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(Fastpay4jApplication.class);
   private final ClientManagementService clientManagementService;
 
   public Fastpay4jApplication(ClientManagementService clientManagementService) {
     this.clientManagementService = clientManagementService;
   }
 
-  public static void main(String[] args) {
-    SpringApplication.run(Fastpay4jApplication.class, args);
+  public static void main(String[] args) throws InterruptedException {
+    ApplicationContext ctx = SpringApplication.run(Fastpay4jApplication.class, args);
 
-//    GreetingWebClient gwc = new GreetingWebClient();
-//    System.out.println(gwc.getResult());
+    // Command line runners don't consume reactive types and simply return after execution, so must block here.
+    final CountDownLatch closeLatch = ctx.getBean(CountDownLatch.class);
+    Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+      LOGGER.info("Terminating Fastpay4j...");
+      closeLatch.countDown();
+    }));
+    closeLatch.await();
   }
 
+  @Bean
+  public CountDownLatch closeLatch() {
+    return new CountDownLatch(1);
+  }
 
   @Override
   public void run(String... args) {
 
-    logger.info("EXECUTING : command line runner");
+    LOGGER.info("EXECUTING : command line runner");
     for (int i = 0; i < args.length; ++i) {
-      logger.info("args[{}]: {}", i, args[i]);
+      LOGGER.info("args[{}]: {}", i, args[i]);
     }
 
     clientManagementService.retrieveClient("localhost")
@@ -55,6 +67,9 @@ public class Fastpay4jApplication implements CommandLineRunner {
       .retryWhen(RetrySpec.backoff(3L, Duration.ofSeconds(1)))
       .flatMap(this::handleHandshake)
       .subscribe();
+
+    //    GreetingWebClient gwc = new GreetingWebClient();
+//    System.out.println(gwc.getResult());
   }
 
   // Reactor has a UDP and TCP Stream implementation built-in that will use Netty.
@@ -77,7 +92,7 @@ public class Fastpay4jApplication implements CommandLineRunner {
   public Mono<Void> handleHandshake(Connection connection) {
     AtomicReference<ClientHandshakeState> handshakeState = new AtomicReference<>(ClientHandshakeState.SEND_INIT_REQ);
 
-    logger.info("Client is initiating custom handshake with payload: {} (HEX)",
+    LOGGER.info("Client is initiating custom handshake with payload: {} (HEX)",
       BaseEncoding.base16().encode(handshakeState.get().getPayload()));
 
     connection.outbound().sendByteArray(Mono.just(handshakeState.get().getPayload())).then().subscribe();
@@ -85,23 +100,23 @@ public class Fastpay4jApplication implements CommandLineRunner {
     return connection.inbound().receive()
       .asByteArray()
       .flatMap(bytes -> {
-        logger.info("Client received HEX payload: {}", BaseEncoding.base16().encode(bytes));
+        LOGGER.info("Client received HEX payload: {}", BaseEncoding.base16().encode(bytes));
 
         if (handshakeState.get().receivedPayloadMatchesExpected(bytes)) {
 
           if (handshakeState.get().getNextStateOrdinal() != null) {
             ClientHandshakeState nextState = ClientHandshakeState.values()[handshakeState.get().getNextStateOrdinal()];
-            logger.info("Client handshake state will become: {}", nextState);
+            LOGGER.info("Client handshake state will become: {}", nextState);
             handshakeState.set(nextState);
 
-            logger.info("Client is sending new request payload: {} (HEX)",
+            LOGGER.info("Client is sending new request payload: {} (HEX)",
               BaseEncoding.base16().encode(handshakeState.get().getPayload()));
 
             connection.outbound().sendByteArray(Mono.just(handshakeState.get().getPayload()))
               .then()
               .subscribe();
           } else {
-            logger.info("Client has completed the custom handshake.");
+            LOGGER.info("Client has completed the custom handshake.");
           }
 
         } else {
@@ -111,7 +126,7 @@ public class Fastpay4jApplication implements CommandLineRunner {
         return Mono.empty();
       })
       .onErrorResume(e -> {
-        logger.error("Error occurred: {}", e.getMessage(), e);
+        LOGGER.error("Error occurred: {}", e.getMessage(), e);
         return Mono.empty();
       })
       .then();
