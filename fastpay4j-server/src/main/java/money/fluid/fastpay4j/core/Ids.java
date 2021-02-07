@@ -2,6 +2,7 @@ package money.fluid.fastpay4j.core;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.primitives.UnsignedLong;
 import money.fluid.fastpay4j.core.keys.PublicKey;
 import money.fluid.fastpay4j.immutables.Wrapped;
 import money.fluid.fastpay4j.immutables.Wrapper;
@@ -35,8 +36,8 @@ public class Ids {
    */
   @Value.Immutable(intern = true)
   @Wrapped
-  @JsonSerialize(as = FastPayAddress.class)
-  @JsonDeserialize(as = FastPayAddress.class)
+  @JsonSerialize(as = AuthorityName.class)
+  @JsonDeserialize(as = AuthorityName.class)
   abstract static class _AuthorityName extends Wrapper<PublicKey> implements Serializable {
 
     @Override
@@ -46,4 +47,19 @@ public class Ids {
 
   }
 
+  /**
+   * A wrapped {@link UnsignedLong} representing the index of a transaction.
+   */
+  @Value.Immutable(intern = true)
+  @Wrapped
+  @JsonSerialize(as = TransactionIndex.class)
+  @JsonDeserialize(as = TransactionIndex.class)
+  abstract static class _TransactionIndex extends Wrapper<UnsignedLong> implements Serializable {
+
+    @Override
+    public String toString() {
+      return this.value().toString();
+    }
+
+  }
 }
