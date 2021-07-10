@@ -1,4 +1,4 @@
-package money.fluid.fastpay4j.core;
+package money.fluid.fastpay4j.core.messages;
 
 import org.immutables.value.Value;
 

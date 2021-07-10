@@ -1,5 +1,6 @@
 package money.fluid.fastpay4j.server.spring.config;
 
+import com.google.common.collect.Lists;
 import money.fluid.fastpay4j.core.keys.Ed25519PrivateKey;
 import money.fluid.fastpay4j.server.settings.AuthoritySettings;
 import money.fluid.fastpay4j.server.settings.ServerSettings;
@@ -16,7 +17,7 @@ public class ServerSettingsFromPropertyFile implements ServerSettings {
 
   private Ed25519PrivateKey serverKey;
   private AuthoritySettingsFromPropertyFile authority;
-  private List<AuthoritySettingsFromPropertyFile> committees;
+  private List<AuthoritySettingsFromPropertyFile> committees = Lists.newArrayList();
 
   public Ed25519PrivateKey getServerKey() {
     return serverKey;

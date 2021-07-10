@@ -1,5 +1,7 @@
-package money.fluid.fastpay4j.core;
+package money.fluid.fastpay4j.core.messages;
 
+import money.fluid.fastpay4j.core.AuthorityName;
+import money.fluid.fastpay4j.core.messages.TransferOrder;
 import org.immutables.value.Value;
 
 import java.security.Signature;

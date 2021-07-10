@@ -8,6 +8,11 @@ import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 
+
+/**
+ * @deprecated Exists only for example purposes. Delete once server processing is implemented and figured out.
+ */
+@Deprecated
 @Configuration
 //@Import( {NettyWebServerFactoryCustomizer.class})
 public class GreetingRouter {

@@ -1,8 +1,13 @@
-package money.fluid.fastpay4j.core;
+package money.fluid.fastpay4j.core.authority;
 
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
+import money.fluid.fastpay4j.core.AuthorityName;
+import money.fluid.fastpay4j.core.Committee;
+import money.fluid.fastpay4j.core.FastPayAddress;
+import money.fluid.fastpay4j.core.authority.ImmutableAuthorityState.Builder;
 import money.fluid.fastpay4j.core.keys.Ed25519PrivateKey;
+import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 
 import java.util.TreeMap;
@@ -10,11 +15,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The current state of a FastPay Authority.  The state of an authority consists of the authority name, signature and
- * verification keys; The committee, represented as a set of authorities and their verification keys; ; An integer
- * value, called last_transaction, referring to the last transaction that paid funds into the Primary. This is used by
+ * verification keys; The committee, represented as a set of authorities and their verification keys; An integer value,
+ * called last_transaction, referring to the last transaction that paid funds into the Primary. This is used by
  * authorities to synchronize FastPay accounts with funds from the Primary (see Section 4.3).
  */
-public interface AuthorityState extends Participant {
+@Value.Immutable
+public interface AuthorityState {
+
+  static Builder builder() {
+    return ImmutableAuthorityState.builder();
+  }
 
   /**
    * The name of this authority.
@@ -42,7 +52,10 @@ public interface AuthorityState extends Participant {
    *
    * @return A {@link TreeMap}.
    */
-  TreeMap<FastPayAddress, AccountOffchainState> accounts();
+  @Default
+  default TreeMap<FastPayAddress, AccountOffchainState> accounts() {
+    return new TreeMap<>();
+  }
 
   /**
    * The latest transaction index of the blockchain that the authority has seen. In the FastPay paper, this value is
@@ -51,7 +64,10 @@ public interface AuthorityState extends Participant {
    *
    * @return An {@link UnsignedLong}.
    */
-  AtomicReference<UnsignedLong> lastTransactionIndex();
+  @Default
+  default AtomicReference<UnsignedLong> lastTransactionIndex() {
+    return new AtomicReference(UnsignedLong.ZERO);
+  }
 
   /**
    * The sharding ID of this authority shard. 0 if one shard.

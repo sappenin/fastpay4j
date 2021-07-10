@@ -30,7 +30,7 @@ public class ServerSettingsFromPropertyFileTest {
 
   @Test
   public void configShouldLoad() {
-    assertThat(serverSettings.authority().networkProtocol()).isEqualTo(NetworkProtocol.Tcp);
+    assertThat(serverSettings.authority().networkProtocol()).isEqualTo(NetworkProtocol.TCP);
     assertThat(serverSettings.authority().fastPayAddress().toString())
       .isEqualTo("du14iIv21IxHW2tNO1htzuEMQBlXrjsK7pp+ySGO2Ak=");
     assertThat(serverSettings.authority().host()).isEqualTo("0.0.0.0");
@@ -42,28 +42,28 @@ public class ServerSettingsFromPropertyFileTest {
     assertThat(serverSettings.serverKey().toString()).isEqualTo("DefaultEd25519PrivateKey{}");
 
     final AuthoritySettings committee0 = serverSettings.committees().get(0);
-    assertThat(committee0.networkProtocol()).isEqualTo(NetworkProtocol.Tcp);
+    assertThat(committee0.networkProtocol()).isEqualTo(NetworkProtocol.TCP);
     assertThat(committee0.fastPayAddress().toString()).isEqualTo("du14iIv21IxHW2tNO1htzuEMQBlXrjsK7pp+ySGO2Ak=");
     assertThat(committee0.host()).isEqualTo("127.0.0.1");
     assertThat(committee0.basePort()).isEqualTo(9100);
     assertThat(committee0.numShards()).isEqualTo(4);
 
     final AuthoritySettings committee1 = serverSettings.committees().get(1);
-    assertThat(committee1.networkProtocol()).isEqualTo(NetworkProtocol.Tcp);
+    assertThat(committee1.networkProtocol()).isEqualTo(NetworkProtocol.TCP);
     assertThat(committee1.fastPayAddress().toString()).isEqualTo("e8SS0ifNr9w3veVNJOlEDfvOmO5A4hrmUSdTfVjDHG8=");
     assertThat(committee1.host()).isEqualTo("127.0.0.1");
     assertThat(committee1.basePort()).isEqualTo(9200);
     assertThat(committee1.numShards()).isEqualTo(4);
 
     final AuthoritySettings committee2 = serverSettings.committees().get(2);
-    assertThat(committee2.networkProtocol()).isEqualTo(NetworkProtocol.Tcp);
+    assertThat(committee2.networkProtocol()).isEqualTo(NetworkProtocol.TCP);
     assertThat(committee2.fastPayAddress().toString()).isEqualTo("vMfxmo3uNERsDJ8pLSOTly32rWlCdjHypmNFac4ZrkU=");
     assertThat(committee2.host()).isEqualTo("127.0.0.1");
     assertThat(committee2.basePort()).isEqualTo(9300);
     assertThat(committee2.numShards()).isEqualTo(4);
 
     final AuthoritySettings committee3 = serverSettings.committees().get(3);
-    assertThat(committee3.networkProtocol()).isEqualTo(NetworkProtocol.Tcp);
+    assertThat(committee3.networkProtocol()).isEqualTo(NetworkProtocol.TCP);
     assertThat(committee3.fastPayAddress().toString()).isEqualTo("tR9hCqW/EuGV73bWPjLjgFF1wv2CgTOYXWee0mcWGlQ=");
     assertThat(committee3.host()).isEqualTo("127.0.0.1");
     assertThat(committee3.basePort()).isEqualTo(9400);

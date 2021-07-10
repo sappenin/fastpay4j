@@ -1,6 +1,9 @@
-package money.fluid.fastpay4j.core;
+package money.fluid.fastpay4j.core.messages;
 
 import com.google.common.primitives.UnsignedLong;
+import money.fluid.fastpay4j.core.FastPayAddress;
+import money.fluid.fastpay4j.core.UserData;
+import money.fluid.fastpay4j.core.messages.ImmutableTransfer.Builder;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 
@@ -13,9 +16,9 @@ public interface Transfer {
   /**
    * A builder.
    *
-   * @return A {@link ImmutableTransfer.Builder}.
+   * @return A {@link Builder}.
    */
-  static ImmutableTransfer.Builder builder() {
+  static Builder builder() {
     return ImmutableTransfer.builder();
   }
 

@@ -1,6 +1,10 @@
-package money.fluid.fastpay4j.core;
+package money.fluid.fastpay4j.core.authority;
 
 import com.google.common.primitives.UnsignedLong;
+import money.fluid.fastpay4j.core.Participant;
+import money.fluid.fastpay4j.core.messages.CetifiedTransferOrder;
+import money.fluid.fastpay4j.core.messages.PrimarySynchronizationOrder;
+import money.fluid.fastpay4j.core.messages.SignedTransferOrder;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
 

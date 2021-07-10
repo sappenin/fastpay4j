@@ -4,13 +4,12 @@ import money.fluid.fastpay4j.core.keys.Ed25519PublicKey;
 import org.immutables.value.Value;
 
 /**
- * A FastPay account is identified by its address, which we instantiate as the cryptographic hash of its public
- * verification key.
+ * A public key for the primary chain that this FastPay server is a sidechain of.
  */
-public interface FastPayAddress {
+public interface PrimaryAddress {
 
-  static ImmutableDefaultFastPayAddress.Builder builder() {
-    return ImmutableDefaultFastPayAddress.builder();
+  static ImmutableDefaultPrimaryAddress.Builder builder() {
+    return ImmutableDefaultPrimaryAddress.builder();
   }
 
   /**
@@ -21,7 +20,7 @@ public interface FastPayAddress {
   Ed25519PublicKey edPublicKey();
 
   @Value.Immutable(intern = true)
-  abstract class DefaultFastPayAddress implements FastPayAddress, Comparable<FastPayAddress> {
+  abstract class DefaultPrimaryAddress implements PrimaryAddress, Comparable<PrimaryAddress> {
 
     @Override
     public abstract Ed25519PublicKey edPublicKey();
@@ -33,7 +32,7 @@ public interface FastPayAddress {
 
     // TODO: Test this
     @Override
-    public int compareTo(FastPayAddress o) {
+    public int compareTo(PrimaryAddress o) {
       return this.edPublicKey().compareTo(o.edPublicKey());
     }
   }

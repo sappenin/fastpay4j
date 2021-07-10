@@ -19,6 +19,10 @@ public interface Ed25519PublicKey extends PublicKey {
     return ImmutableDefaultEd25519PublicKey.builder();
   }
 
+  static Ed25519PublicKey fromBase64(final String base64EncodedKey) {
+    return builder().bytes(Base64.getDecoder().decode(base64EncodedKey)).build();
+  }
+
   /**
    * To satisfy immutables.
    */

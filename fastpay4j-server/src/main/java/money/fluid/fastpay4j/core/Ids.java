@@ -15,37 +15,37 @@ import java.io.Serializable;
  */
 public class Ids {
 
-  /**
-   * A wrapped {@link PublicKey} representing an address for a Primary.
-   */
-  @Value.Immutable(intern = true)
-  @Wrapped
-  @JsonSerialize(as = PrimaryAddress.class)
-  @JsonDeserialize(as = PrimaryAddress.class)
-  abstract static class _PrimaryAddress extends Wrapper<PublicKey> implements Serializable {
-
-    @Override
-    public String toString() {
-      return this.value().toString();
-    }
-
-  }
-
-  /**
-   * A wrapped {@link PublicKey} representing the name of an Authority.l
-   */
-  @Value.Immutable(intern = true)
-  @Wrapped
-  @JsonSerialize(as = AuthorityName.class)
-  @JsonDeserialize(as = AuthorityName.class)
-  abstract static class _AuthorityName extends Wrapper<PublicKey> implements Serializable {
-
-    @Override
-    public String toString() {
-      return this.value().toString();
-    }
-
-  }
+//  /**
+//   * A wrapped {@link PublicKey} representing an address for a Primary ledger (e.g., Libra, XRPL, or an RTGS).
+//   */
+//  @Value.Immutable(intern = true)
+//  @Wrapped
+//  @JsonSerialize(as = PrimaryAddress.class)
+//  @JsonDeserialize(as = PrimaryAddress.class)
+//  abstract static class _PrimaryAddress extends Wrapper<PublicKey> implements Serializable {
+//
+//    @Override
+//    public String toString() {
+//      return this.value().toString();
+//    }
+//
+//  }
+//
+//  /**
+//   * A wrapped {@link PublicKey} representing the name of an Authority.
+//   */
+//  @Value.Immutable(intern = true)
+//  @Wrapped
+//  @JsonSerialize(as = AuthorityName.class)
+//  @JsonDeserialize(as = AuthorityName.class)
+//  abstract static class _AuthorityName extends Wrapper<PublicKey> implements Serializable {
+//
+//    @Override
+//    public String toString() {
+//      return this.value().toString();
+//    }
+//
+//  }
 
   /**
    * A wrapped {@link UnsignedLong} representing the index of a transaction.
@@ -62,4 +62,22 @@ public class Ids {
     }
 
   }
+
+  /**
+   * A wrapped {@link UnsignedLong} representing the index of a transaction.
+   */
+  @Value.Immutable(intern = true)
+  @Wrapped
+  @JsonSerialize(as = SequenceNumber.class)
+  @JsonDeserialize(as = SequenceNumber.class)
+  abstract static class _SequenceNumber extends Wrapper<UnsignedLong> implements Serializable {
+
+    @Override
+    public String toString() {
+      return this.value().toString();
+    }
+
+  }
+
+
 }

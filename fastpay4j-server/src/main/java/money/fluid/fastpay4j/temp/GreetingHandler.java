@@ -7,6 +7,10 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+/**
+ * @deprecated Exists only for example purposes. Delete once server processing is implemented and figured out.
+ */
+@Deprecated
 @Component
 public class GreetingHandler {
 
@@ -14,8 +18,6 @@ public class GreetingHandler {
     return ServerResponse.ok().contentType(MediaType.TEXT_PLAIN)
       .body(BodyInserters.fromValue("Hello, Spring!"));
   }
-
-
 
 //  @GetMapping
 //  private Flux<Employee> getAllEmployees() {
