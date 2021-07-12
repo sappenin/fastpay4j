@@ -1,0 +1,126 @@
+---
+AccountInfoRequest:
+  STRUCT:
+    - sender:
+        TYPENAME: EdPublicKeyBytes
+    - request_sequence_number:
+        OPTION:
+          TYPENAME: SequenceNumber
+    - request_received_transfers_excluding_first_nth:
+        OPTION: U64
+AccountInfoResponse:
+  STRUCT:
+    - sender:
+        TYPENAME: EdPublicKeyBytes
+    - balance:
+        TYPENAME: Balance
+    - next_sequence_number:
+        TYPENAME: SequenceNumber
+    - pending_confirmation:
+        OPTION:
+          TYPENAME: SignedTransferOrder
+    - requested_certificate:
+        OPTION:
+          TYPENAME: CertifiedTransferOrder
+    - requested_received_transfers:
+        SEQ:
+          TYPENAME: CertifiedTransferOrder
+Address:
+  ENUM:
+    0:
+      Primary:
+        NEWTYPE:
+          TYPENAME: EdPublicKeyBytes
+    1:
+      FastPay:
+        NEWTYPE:
+          TYPENAME: EdPublicKeyBytes
+Amount:
+  NEWTYPESTRUCT: U64
+Balance:
+  NEWTYPESTRUCT: I128
+CertifiedTransferOrder:
+  STRUCT:
+    - value:
+        TYPENAME: TransferOrder
+    - signatures:
+        SEQ:
+          TUPLE:
+            - TYPENAME: EdPublicKeyBytes
+            - TYPENAME: Signature
+ConfirmationOrder:
+  STRUCT:
+    - transfer_certificate:
+        TYPENAME: CertifiedTransferOrder
+CrossShardUpdate:
+  STRUCT:
+    - shard_id: U32
+    - transfer_certificate:
+        TYPENAME: CertifiedTransferOrder
+EdPublicKeyBytes:
+  NEWTYPESTRUCT:
+    TUPLEARRAY:
+      CONTENT: U8
+      SIZE: 32
+FundingTransaction:
+  STRUCT:
+    - recipient:
+        TYPENAME: EdPublicKeyBytes
+    - primary_coins:
+        TYPENAME: Amount
+PrimarySynchronizationOrder:
+  STRUCT:
+    - recipient:
+        TYPENAME: EdPublicKeyBytes
+    - amount:
+        TYPENAME: Amount
+    - transaction_index:
+        TYPENAME: SequenceNumber
+RedeemTransaction:
+  STRUCT:
+    - transfer_certificate:
+        TYPENAME: CertifiedTransferOrder
+SequenceNumber:
+  NEWTYPESTRUCT: U64
+Signature:
+  STRUCT:
+    - part1:
+        TUPLEARRAY:
+          CONTENT: U8
+          SIZE: 32
+    - part2:
+        TUPLEARRAY:
+          CONTENT: U8
+          SIZE: 32
+SignedTransferOrder:
+  STRUCT:
+    - value:
+        TYPENAME: TransferOrder
+    - authority:
+        TYPENAME: EdPublicKeyBytes
+    - signature:
+        TYPENAME: Signature
+Transfer:
+  STRUCT:
+    - sender:
+        TYPENAME: EdPublicKeyBytes
+    - recipient:
+        TYPENAME: Address
+    - amount:
+        TYPENAME: Amount
+    - sequence_number:
+        TYPENAME: SequenceNumber
+    - user_data:
+        TYPENAME: UserData
+TransferOrder:
+  STRUCT:
+    - transfer:
+        TYPENAME: Transfer
+    - signature:
+        TYPENAME: Signature
+UserData:
+  NEWTYPESTRUCT:
+    OPTION:
+      TUPLEARRAY:
+        CONTENT: U8
+        SIZE: 32
