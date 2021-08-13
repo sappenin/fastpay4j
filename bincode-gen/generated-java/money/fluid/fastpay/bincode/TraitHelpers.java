@@ -1,4 +1,4 @@
-package money.fluid.fastpay.bincode;
+package com.sappenin.fastpay.bincode;
 
 final class TraitHelpers {
     static void serialize_array32_u8_array(java.util.@com.novi.serde.ArrayLen(length=32) List<@com.novi.serde.Unsigned Byte> value, com.novi.serde.Serializer serializer) throws com.novi.serde.SerializationError {

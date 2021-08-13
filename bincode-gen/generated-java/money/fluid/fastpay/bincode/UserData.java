@@ -1,4 +1,4 @@
-package money.fluid.fastpay.bincode;
+package com.sappenin.fastpay.bincode;
 
 
 public final class UserData {
