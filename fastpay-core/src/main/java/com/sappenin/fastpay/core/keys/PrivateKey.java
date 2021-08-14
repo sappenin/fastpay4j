@@ -1,9 +1,11 @@
 package com.sappenin.fastpay.core.keys;
 
+import com.sappenin.fastpay.core.FastpayModel;
+
 /**
  * A private key.
  */
-public interface PrivateKey extends Comparable<PrivateKey> {
+public interface PrivateKey extends Comparable<PrivateKey>, FastpayModel {
 
   /**
    * The bytes of this private key.

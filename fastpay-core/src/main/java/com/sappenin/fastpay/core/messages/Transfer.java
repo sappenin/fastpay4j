@@ -1,7 +1,9 @@
 package com.sappenin.fastpay.core.messages;
 
 import com.google.common.primitives.UnsignedLong;
+import com.sappenin.fastpay.core.Address;
 import com.sappenin.fastpay.core.FastPayAddress;
+import com.sappenin.fastpay.core.FastpayModel;
 import com.sappenin.fastpay.core.UserData;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
@@ -10,7 +12,7 @@ import org.immutables.value.Value.Default;
  * Holds all information to model a transfer of funds by a FastPay account.
  */
 @Value.Immutable
-public interface Transfer {
+public interface Transfer extends FastpayModel {
 
   /**
    * A builder.

@@ -3,18 +3,18 @@ package com.sappenin.fastpay.client;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.UnsignedLong;
-import com.novi.serde.DeserializationError;
 import com.sappenin.fastpay.core.CertifiedTransferOrder;
 import com.sappenin.fastpay.core.FastPayAddress;
 import com.sappenin.fastpay.core.UserData;
-import com.sappenin.fastpay.core.authority.AuthorityUtils;
+import com.sappenin.fastpay.core.AuthorityUtils;
 import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
 import com.sappenin.fastpay.core.bincode.AccountInfoResponse;
+import com.sappenin.fastpay.core.bincode.FastPayError;
 import com.sappenin.fastpay.core.keys.Ed25519PublicKey;
 import com.sappenin.fastpay.core.messages.CetifiedTransferOrder;
 import com.sappenin.fastpay.core.messages.TransferOrder;
-import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
 import com.sappenin.fastpay.core.serde.BincodeSerde;
+import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelOption;
@@ -49,7 +49,7 @@ public class DefaultAuthorityClient implements AuthorityClient {
    *
    * @param networkOptions An instance of {@link ClientNetworkOptions}.
    * @param clientState    An instance of {@link AuthorityClientState}.
-   * @param serde   An instance of {@link BincodeSerde}.
+   * @param serde          An instance of {@link BincodeSerde}.
    */
   public DefaultAuthorityClient(
     final ClientNetworkOptions networkOptions,
@@ -92,7 +92,7 @@ public class DefaultAuthorityClient implements AuthorityClient {
     );
 
     return Mono
-      .just(serde.serializeAccountInfoRequest(accountInfoRequest))
+      .just(serde.serialize(accountInfoRequest))
       .map(Unpooled::wrappedBuffer)
       .map(requestByteBuf -> this.sendAndReceiveBytes(shardNumber, requestByteBuf))
       .map(byteBuf -> {
@@ -102,15 +102,14 @@ public class DefaultAuthorityClient implements AuthorityClient {
         return bytes;
       })
       .map(bytes -> {
+        // TODO: Detect AccountInfoResponse vs FastpayError (see tuple comment below).
         try {
-          // TODO: Detect AccountInfoResponse vs FastpayError (see tuple comment below).
-          return serde.deserializeAccountInfoResponse(bytes);
-        } catch (DeserializationError e) {
-          //return bincodeSerde.deserializeError(bytes);
-          return null;
+          return serde.deserialize(AccountInfoResponse.class, bytes);
+        }catch (Exception e){
+          // An exception was thrown, so try to deserialize a FastPayError.
+          FastPayError fastPayError = this.serde.deserialize(FastPayError.class, bytes);
         }
       });
-
   }
 
   // TODO: Add a FastpayError to the response as a Tuple?

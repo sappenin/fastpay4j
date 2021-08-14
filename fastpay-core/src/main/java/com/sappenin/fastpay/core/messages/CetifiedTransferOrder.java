@@ -1,6 +1,7 @@
 package com.sappenin.fastpay.core.messages;
 
 import com.sappenin.fastpay.core.AuthorityName;
+import com.sappenin.fastpay.core.FastpayModel;
 import org.immutables.value.Value;
 
 import java.security.Signature;
@@ -10,7 +11,7 @@ import java.util.Map;
  * A {@link TransferOrder} that has been certified (i.e., signed) by a quorum of authorities.
  */
 @Value.Immutable
-public interface CetifiedTransferOrder {
+public interface CetifiedTransferOrder extends FastpayModel {
 
   /**
    * The {@link TransferOrder}.

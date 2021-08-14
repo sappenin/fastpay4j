@@ -1,10 +1,9 @@
-package com.sappenin.fastpay.core.authority;
+package com.sappenin.fastpay.core;
 
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
-import com.sappenin.fastpay.core.AuthorityName;
-import com.sappenin.fastpay.core.Committee;
-import com.sappenin.fastpay.core.FastPayAddress;
+import com.sappenin.fastpay.core.authority.ImmutableAuthorityState;
+import com.sappenin.fastpay.core.authority.ImmutableAuthorityState.Builder;
 import com.sappenin.fastpay.core.keys.Ed25519PrivateKey;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
@@ -19,9 +18,9 @@ import java.util.concurrent.atomic.AtomicReference;
  * authorities to synchronize FastPay accounts with funds from the Primary (see Section 4.3).
  */
 @Value.Immutable
-public interface AuthorityState {
+public interface AuthorityState extends FastpayModel {
 
-  static ImmutableAuthorityState.Builder builder() {
+  static Builder builder() {
     return ImmutableAuthorityState.builder();
   }
 

@@ -15,7 +15,7 @@ import java.util.TreeMap;
  * A fixed-membership group of authorities that can authorize off-chain payments based upon a threshold of signatures.
  */
 @Immutable
-public interface Committee {
+public interface Committee extends FastpayModel{
 
   static ImmutableCommittee.Builder builder() {
     return ImmutableCommittee.builder();

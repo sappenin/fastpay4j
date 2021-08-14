@@ -6,7 +6,7 @@ import org.immutables.value.Value;
 /**
  * The public key for a FastPay authority.
  */
-public interface AuthorityName {
+public interface AuthorityName extends FastpayModel{
 
   static ImmutableDefaultAuthorityName.Builder builder() {
     return ImmutableDefaultAuthorityName.builder();

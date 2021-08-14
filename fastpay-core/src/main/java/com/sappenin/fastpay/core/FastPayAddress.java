@@ -7,7 +7,7 @@ import org.immutables.value.Value;
  * A FastPay account is identified by its address, which we instantiate as the cryptographic hash of its public
  * verification key.
  */
-public interface FastPayAddress {
+public interface FastPayAddress extends FastpayModel {
 
   static ImmutableDefaultFastPayAddress.Builder builder() {
     return ImmutableDefaultFastPayAddress.builder();

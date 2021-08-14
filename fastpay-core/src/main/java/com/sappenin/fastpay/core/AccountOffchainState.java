@@ -1,4 +1,4 @@
-package com.sappenin.fastpay.core.authority;
+package com.sappenin.fastpay.core;
 
 import com.google.common.primitives.UnsignedLong;
 import com.sappenin.fastpay.core.Participant;

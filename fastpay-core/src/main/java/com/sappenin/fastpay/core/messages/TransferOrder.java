@@ -1,5 +1,6 @@
 package com.sappenin.fastpay.core.messages;
 
+import com.sappenin.fastpay.core.FastpayModel;
 import org.immutables.value.Value;
 
 import java.security.Signature;
@@ -8,7 +9,7 @@ import java.security.Signature;
  * All transfers initiated by a FastPay account start with a transfer order `𝑂`.
  */
 @Value.Immutable
-public interface TransferOrder {
+public interface TransferOrder extends FastpayModel {
 
   static ImmutableTransferOrder.Builder builder() {
     return ImmutableTransferOrder.builder();

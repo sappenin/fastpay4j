@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * A transfer order that has been certified by a quorum of authorities.
  */
-public interface CertifiedTransferOrder {
+public interface CertifiedTransferOrder extends FastpayModel{
 
   /**
    * The {@link TransferOrder} that has been certified by a quorum of authorities.

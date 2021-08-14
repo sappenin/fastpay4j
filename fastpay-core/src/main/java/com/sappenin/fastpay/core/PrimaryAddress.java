@@ -6,7 +6,7 @@ import org.immutables.value.Value;
 /**
  * A public key for the primary chain that this FastPay server is a sidechain of.
  */
-public interface PrimaryAddress {
+public interface PrimaryAddress extends FastpayModel {
 
   static ImmutableDefaultPrimaryAddress.Builder builder() {
     return ImmutableDefaultPrimaryAddress.builder();

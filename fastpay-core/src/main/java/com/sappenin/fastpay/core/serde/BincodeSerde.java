@@ -85,7 +85,7 @@ public class BincodeSerde implements Serde {
    * @return An instance of {@link FastpayError}.
    */
   // TODO: Unit test
-  private FastpayError fromBincode(final com.sappenin.fastpay.core.bincode.FastPayError error) {
+  public FastpayError fromBincode(final com.sappenin.fastpay.core.bincode.FastPayError error) {
     Objects.requireNonNull(error);
 
     if (InvalidSignature.class.isAssignableFrom(error.getClass())) {

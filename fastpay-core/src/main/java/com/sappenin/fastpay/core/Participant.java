@@ -8,7 +8,7 @@ import com.sappenin.fastpay.core.keys.PublicKey;
  * key.
  */
 // TODO: Delete this interface if it's only used on AccountState since it's not in Rust and maybe doesn't add value.
-public interface Participant {
+public interface Participant extends FastpayModel {
 
   /**
    * The public key of this participant.

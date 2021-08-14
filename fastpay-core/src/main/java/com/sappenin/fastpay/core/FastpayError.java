@@ -34,7 +34,7 @@ import java.util.Objects;
 
 // TODO: Unit tests!
 @Immutable
-public interface FastpayError {
+public interface FastpayError extends FastpayModel{
 
   static ImmutableFastpayError.Builder builder() {
     return ImmutableFastpayError.builder();

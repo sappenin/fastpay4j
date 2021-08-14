@@ -7,7 +7,7 @@ import org.immutables.value.Value.Default;
  * Any data supplied by a "user" (e.g., an actual end-user or financial institution) of a FastPay account.
  */
 @Value.Immutable
-public interface UserData {
+public interface UserData extends FastpayModel{
 
   byte[] EMPTY_BYTES = new byte[0];
 
