@@ -16,6 +16,7 @@ import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
 import com.sappenin.fastpay.core.bincode.AccountInfoResponse;
 import com.sappenin.fastpay.core.keys.Ed25519PrivateKey;
 import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
+import com.sappenin.fastpay.core.serde.BincodeSerde;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -100,14 +101,15 @@ class DefaultAuthorityClientIT extends AbstractIT {
         .committee(Committee.builder()
           .votingRights(votingRights)
           .build())
-        .build()
+        .build(),
+      new BincodeSerde()
     );
   }
 
   @Test
   void getAccountInfo() {
     AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
-    builder.sender = BincodeSerdeUtils.toSerializableKey(CLIENT_ADDRESS.edPublicKey());
+    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(CLIENT_ADDRESS.edPublicKey());
     builder.request_sequence_number = Optional.of(
       BincodeSerdeUtils.toSerializableSequenceNumber(SequenceNumber.of(UnsignedLong.ONE)));
     builder.request_received_transfers_excluding_first_nth = Optional.empty();

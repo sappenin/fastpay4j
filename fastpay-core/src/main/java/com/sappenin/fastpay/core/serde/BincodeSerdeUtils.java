@@ -22,11 +22,8 @@ import java.util.stream.IntStream;
  */
 public class BincodeSerdeUtils {
 
-
   // TODO: Unit test back and forth.
-  public static EdPublicKeyBytes toSerializableKey(
-    final Ed25519PublicKey ed25519PublicKey
-  ) {
+  public static EdPublicKeyBytes toEdPublicKeyBytes(final Ed25519PublicKey ed25519PublicKey) {
     Objects.requireNonNull(ed25519PublicKey);
 
     final List<@Unsigned Byte> value = new ArrayList<>(32);

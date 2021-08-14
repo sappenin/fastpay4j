@@ -10,6 +10,10 @@ import java.security.Signature;
 @Value.Immutable
 public interface TransferOrder {
 
+  static ImmutableTransferOrder.Builder builder() {
+    return ImmutableTransferOrder.builder();
+  }
+
   /**
    * Details about the actual transfer.
    *

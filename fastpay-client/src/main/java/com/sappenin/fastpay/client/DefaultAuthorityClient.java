@@ -4,7 +4,6 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.UnsignedLong;
 import com.novi.serde.DeserializationError;
-import com.novi.serde.SerializationError;
 import com.sappenin.fastpay.core.CertifiedTransferOrder;
 import com.sappenin.fastpay.core.FastPayAddress;
 import com.sappenin.fastpay.core.UserData;
@@ -15,6 +14,7 @@ import com.sappenin.fastpay.core.keys.Ed25519PublicKey;
 import com.sappenin.fastpay.core.messages.CetifiedTransferOrder;
 import com.sappenin.fastpay.core.messages.TransferOrder;
 import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
+import com.sappenin.fastpay.core.serde.BincodeSerde;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelOption;
@@ -42,19 +42,23 @@ public class DefaultAuthorityClient implements AuthorityClient {
   private final AuthorityClientState clientState;
   private final List<CetifiedTransferOrder> sentCertificates;
   private final LoopResources resources;
+  private final BincodeSerde serde;
 
   /**
    * Required-args constructor.
    *
    * @param networkOptions An instance of {@link ClientNetworkOptions}.
    * @param clientState    An instance of {@link AuthorityClientState}.
+   * @param serde   An instance of {@link BincodeSerde}.
    */
   public DefaultAuthorityClient(
     final ClientNetworkOptions networkOptions,
-    final AuthorityClientState clientState
+    final AuthorityClientState clientState,
+    final BincodeSerde serde
   ) {
     this.clientNetworkOptions = Objects.requireNonNull(networkOptions);
     this.clientState = Objects.requireNonNull(clientState);
+    this.serde = Objects.requireNonNull(serde);
 
     this.sentCertificates = Lists.newArrayList();
     this.resources = LoopResources.create("fastpayUdpClient");
@@ -80,35 +84,33 @@ public class DefaultAuthorityClient implements AuthorityClient {
   public Mono<AccountInfoResponse> getAccountInfo(final AccountInfoRequest accountInfoRequest) {
     Objects.requireNonNull(accountInfoRequest);
 
-    try {
-      final int shardNumber = AuthorityUtils.deriveShardNumber(
-        clientNetworkOptions.numShards(),
-        FastPayAddress.builder()
-          .edPublicKey(Ed25519PublicKey.fromBase64(BincodeSerdeUtils.toHexString(accountInfoRequest.sender.value)))
-          .build()
-      );
+    final int shardNumber = AuthorityUtils.deriveShardNumber(
+      clientNetworkOptions.numShards(),
+      FastPayAddress.builder()
+        .edPublicKey(Ed25519PublicKey.fromBase64(BincodeSerdeUtils.toHexString(accountInfoRequest.sender.value)))
+        .build()
+    );
 
-      return Mono
-        .just(
-          // TODO: consider inverting this. Even though the accountInfoRequest can do its own serialization, we might want
-          //  to pass this object to a service for future separation of concerns (e.g, to support alternate encodings)
-          accountInfoRequest.bincodeSerialize()
-        )
-        .map(Unpooled::copiedBuffer)
-        .map(requestByteBuf -> this.sendAndReceiveBytes(shardNumber, requestByteBuf))
-        .map(byteBuf -> {
-          try {
-            // TODO: Detect AccountInfoResponse vs FastpayError (see tuple comment below).
-            return AccountInfoResponse.bincodeDeserialize(byteBuf.array());
-          } catch (DeserializationError e) {
-            throw new RuntimeException(e.getMessage(), e);
-          } finally {
-            byteBuf.release();
-          }
-        });
-    } catch (SerializationError e) {
-      return Mono.error(new RuntimeException(e.getMessage(), e));
-    }
+    return Mono
+      .just(serde.serializeAccountInfoRequest(accountInfoRequest))
+      .map(Unpooled::wrappedBuffer)
+      .map(requestByteBuf -> this.sendAndReceiveBytes(shardNumber, requestByteBuf))
+      .map(byteBuf -> {
+        byte[] bytes = new byte[byteBuf.readableBytes()];
+        byteBuf.readBytes(bytes);
+        byteBuf.release();
+        return bytes;
+      })
+      .map(bytes -> {
+        try {
+          // TODO: Detect AccountInfoResponse vs FastpayError (see tuple comment below).
+          return serde.deserializeAccountInfoResponse(bytes);
+        } catch (DeserializationError e) {
+          //return bincodeSerde.deserializeError(bytes);
+          return null;
+        }
+      });
+
   }
 
   // TODO: Add a FastpayError to the response as a Tuple?

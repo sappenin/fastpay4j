@@ -50,7 +50,7 @@ public class CertificateRequester {
     Objects.requireNonNull(sequenceNumber);
 
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
-    builder.sender = BincodeSerdeUtils.toSerializableKey(senderAddress.edPublicKey());
+    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(senderAddress.edPublicKey());
     builder.request_sequence_number = Optional.of(BincodeSerdeUtils.toSerializableSequenceNumber(sequenceNumber));
     builder.request_received_transfers_excluding_first_nth = Optional.empty();
     final AccountInfoRequest request = builder.build();

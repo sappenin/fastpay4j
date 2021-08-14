@@ -1,5 +1,31 @@
 package com.sappenin.fastpay.core;
 
+import com.sappenin.fastpay.core.bincode.FastPayError.AmountOverflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.AmountUnderflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.BalanceOverflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.BalanceUnderflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.CertificateAuthorityReuse;
+import com.sappenin.fastpay.core.bincode.FastPayError.CertificateNotfound;
+import com.sappenin.fastpay.core.bincode.FastPayError.CertificateRequiresQuorum;
+import com.sappenin.fastpay.core.bincode.FastPayError.ClientIoError;
+import com.sappenin.fastpay.core.bincode.FastPayError.ErrorWhileProcessingTransferOrder;
+import com.sappenin.fastpay.core.bincode.FastPayError.ErrorWhileRequestingCertificate;
+import com.sappenin.fastpay.core.bincode.FastPayError.IncorrectTransferAmount;
+import com.sappenin.fastpay.core.bincode.FastPayError.InsufficientFunding;
+import com.sappenin.fastpay.core.bincode.FastPayError.InvalidCrossShardUpdate;
+import com.sappenin.fastpay.core.bincode.FastPayError.InvalidDecoding;
+import com.sappenin.fastpay.core.bincode.FastPayError.InvalidSequenceNumber;
+import com.sappenin.fastpay.core.bincode.FastPayError.InvalidSignature;
+import com.sappenin.fastpay.core.bincode.FastPayError.MissingEalierConfirmations;
+import com.sappenin.fastpay.core.bincode.FastPayError.PreviousTransferMustBeConfirmedFirst;
+import com.sappenin.fastpay.core.bincode.FastPayError.SequenceOverflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.SequenceUnderflow;
+import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedMessage;
+import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedSequenceNumber;
+import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedTransactionIndex;
+import com.sappenin.fastpay.core.bincode.FastPayError.UnknownSenderAccount;
+import com.sappenin.fastpay.core.bincode.FastPayError.UnknownSigner;
+import com.sappenin.fastpay.core.bincode.FastPayError.WrongShard;
 import com.sappenin.fastpay.core.bincode.SequenceNumber;
 import com.sappenin.fastpay.core.messages.TransferOrder;
 import org.immutables.value.Value.Immutable;
@@ -9,6 +35,10 @@ import java.util.Objects;
 // TODO: Unit tests!
 @Immutable
 public interface FastpayError {
+
+  static ImmutableFastpayError.Builder builder() {
+    return ImmutableFastpayError.builder();
+  }
 
   static FastpayError invalidSignature(final String signature) {
     Objects.requireNonNull(signature);
