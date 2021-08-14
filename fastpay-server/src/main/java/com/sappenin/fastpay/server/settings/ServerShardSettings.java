@@ -1,6 +1,6 @@
 package com.sappenin.fastpay.server.settings;
 
-import com.sappenin.fastpay.core.authority.AuthorityState;
+import com.sappenin.fastpay.core.AuthorityState;
 import org.immutables.value.Value;
 
 /**

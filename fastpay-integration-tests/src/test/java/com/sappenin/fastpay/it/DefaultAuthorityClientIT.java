@@ -1,6 +1,7 @@
 package com.sappenin.fastpay.it;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.fail;
 
 import com.google.common.primitives.UnsignedLong;
 import com.sappenin.fastpay.client.AuthorityClient;
@@ -10,26 +11,29 @@ import com.sappenin.fastpay.client.DefaultAuthorityClient;
 import com.sappenin.fastpay.core.AuthorityName;
 import com.sappenin.fastpay.core.Committee;
 import com.sappenin.fastpay.core.FastPayAddress;
+import com.sappenin.fastpay.core.FastpayException;
 import com.sappenin.fastpay.core.NetworkProtocol;
 import com.sappenin.fastpay.core.SequenceNumber;
-import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
-import com.sappenin.fastpay.core.bincode.AccountInfoResponse;
 import com.sappenin.fastpay.core.keys.Ed25519PrivateKey;
-import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
+import com.sappenin.fastpay.core.messages.AccountInfoRequest;
 import com.sappenin.fastpay.core.serde.BincodeSerde;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
-import java.time.Duration;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
 /**
  * An integration test that validates the functionality of the {@link DefaultAuthorityClient}.
  */
-class DefaultAuthorityClientIT extends AbstractIT {
+public class DefaultAuthorityClientIT extends AbstractIT {
+
+  private final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
   // These correspond to the default accounts in Fastpay Rust.
   private FastPayAddress CLIENT_ADDRESS =
@@ -65,6 +69,62 @@ class DefaultAuthorityClientIT extends AbstractIT {
 
   @BeforeEach
   void setUp() {
+    this.authorityClient = constructAuthorityClient(HOST, PORT);
+  }
+
+
+  /**
+   * Tries to connect to an invalid address.
+   */
+  @Test
+  void getAccountInfoWhenNoServer() {
+    AuthorityClient authorityClient = constructAuthorityClient("example.com", PORT);
+
+    AccountInfoRequest request = AccountInfoRequest.builder()
+      .sender(CLIENT_ADDRESS)
+      .requestSequenceNumber(Optional.of(SequenceNumber.of(UnsignedLong.ONE)))
+      .build();
+
+    try {
+      authorityClient.getAccountInfo(request)
+        .doOnSuccess($ -> {
+          fail("Should have failed but didn't");
+        })
+        .doOnError(throwable -> {
+          LOGGER.error(throwable.getMessage(), throwable);
+          assertThat(throwable.getMessage()).isEqualTo("No result from Fastpay Server");
+        })
+        .block();
+    } catch (FastpayException e) {
+      // TODO: A Mono with an error shouldn't throw an exception, but reactor-netty does. Is this correct?
+      assertThat(e.getMessage()).isEqualTo("No result from Fastpay Server");
+    }
+  }
+
+  @Test
+  void getAccountInfo() {
+    AccountInfoRequest request = AccountInfoRequest.builder()
+      .sender(CLIENT_ADDRESS)
+      .requestSequenceNumber(Optional.of(SequenceNumber.of(UnsignedLong.ONE)))
+      .build();
+
+    this.authorityClient.getAccountInfo(request)
+      .doOnSuccess($ -> {
+        assertThat($.balance()).isEqualTo(BigInteger.TEN);
+      })
+      .doOnError(throwable -> {
+        fail("Shouldn't have thrown an exception, but did", throwable);
+      })
+      .onErrorStop()
+      .block();
+  }
+
+  //////////////////
+  // Private Helpers
+  //////////////////
+
+  private TreeMap<AuthorityName, UnsignedLong> constructVotingRights() {
+
     final TreeMap<AuthorityName, UnsignedLong> votingRights = new TreeMap<>();
 
     // TODO: Does the client go into the voting rights maps?
@@ -85,10 +145,16 @@ class DefaultAuthorityClientIT extends AbstractIT {
       UnsignedLong.ONE
     );
 
-    this.authorityClient = new DefaultAuthorityClient(
+    return votingRights;
+  }
+
+  private AuthorityClient constructAuthorityClient(final String host, final int port) {
+    Objects.requireNonNull(host);
+
+    return new DefaultAuthorityClient(
       ClientNetworkOptions.builder()
-        .baseAddress(HOST)
-        .basePort(PORT)
+        .baseAddress(host)
+        .basePort(port)
         .networkProtocol(NetworkProtocol.UDP)
         .numShards(1)
         .build(),
@@ -99,28 +165,11 @@ class DefaultAuthorityClientIT extends AbstractIT {
         .nextSequenceNumber(SequenceNumber.of(UnsignedLong.ONE))
         .authorityClients(Map.of())
         .committee(Committee.builder()
-          .votingRights(votingRights)
+          .votingRights(constructVotingRights())
           .build())
         .build(),
       new BincodeSerde()
     );
+
   }
-
-  @Test
-  void getAccountInfo() {
-    AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
-    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(CLIENT_ADDRESS.edPublicKey());
-    builder.request_sequence_number = Optional.of(
-      BincodeSerdeUtils.toSerializableSequenceNumber(SequenceNumber.of(UnsignedLong.ONE)));
-    builder.request_received_transfers_excluding_first_nth = Optional.empty();
-    final AccountInfoRequest request = builder.build();
-
-    AccountInfoResponse response = this.authorityClient
-      .getAccountInfo(request)
-      .block(Duration.ofSeconds(5));
-
-    assertThat(response).isNotNull();
-    assertThat(response.balance.value).isEqualTo(BigInteger.TEN);
-  }
-
 }

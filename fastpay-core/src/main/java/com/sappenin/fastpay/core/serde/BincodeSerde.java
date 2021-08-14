@@ -3,37 +3,14 @@ package com.sappenin.fastpay.core.serde;
 import com.novi.serde.DeserializationError;
 import com.novi.serde.SerializationError;
 import com.sappenin.fastpay.core.FastpayError;
+import com.sappenin.fastpay.core.FastpayException;
 import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
+import com.sappenin.fastpay.core.bincode.AccountInfoResponse;
 import com.sappenin.fastpay.core.bincode.FastPayError;
-import com.sappenin.fastpay.core.bincode.FastPayError.AmountOverflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.AmountUnderflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.BalanceOverflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.BalanceUnderflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.CertificateAuthorityReuse;
-import com.sappenin.fastpay.core.bincode.FastPayError.CertificateNotfound;
-import com.sappenin.fastpay.core.bincode.FastPayError.CertificateRequiresQuorum;
-import com.sappenin.fastpay.core.bincode.FastPayError.ClientIoError;
-import com.sappenin.fastpay.core.bincode.FastPayError.ErrorWhileProcessingTransferOrder;
-import com.sappenin.fastpay.core.bincode.FastPayError.ErrorWhileRequestingCertificate;
-import com.sappenin.fastpay.core.bincode.FastPayError.IncorrectTransferAmount;
-import com.sappenin.fastpay.core.bincode.FastPayError.InsufficientFunding;
-import com.sappenin.fastpay.core.bincode.FastPayError.InvalidCrossShardUpdate;
-import com.sappenin.fastpay.core.bincode.FastPayError.InvalidDecoding;
-import com.sappenin.fastpay.core.bincode.FastPayError.InvalidSequenceNumber;
-import com.sappenin.fastpay.core.bincode.FastPayError.InvalidSignature;
-import com.sappenin.fastpay.core.bincode.FastPayError.MissingEalierConfirmations;
-import com.sappenin.fastpay.core.bincode.FastPayError.PreviousTransferMustBeConfirmedFirst;
-import com.sappenin.fastpay.core.bincode.FastPayError.SequenceOverflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.SequenceUnderflow;
-import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedMessage;
-import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedSequenceNumber;
-import com.sappenin.fastpay.core.bincode.FastPayError.UnexpectedTransactionIndex;
-import com.sappenin.fastpay.core.bincode.FastPayError.UnknownSenderAccount;
-import com.sappenin.fastpay.core.bincode.FastPayError.UnknownSigner;
-import com.sappenin.fastpay.core.bincode.FastPayError.WrongShard;
 import com.sappenin.fastpay.core.bincode.SerializedMessage;
 import com.sappenin.fastpay.core.bincode.SerializedMessage.Error;
 import com.sappenin.fastpay.core.bincode.SerializedMessage.InfoReq;
+import com.sappenin.fastpay.core.bincode.SerializedMessage.InfoResp;
 
 import java.util.Objects;
 
@@ -46,8 +23,11 @@ public class BincodeSerde implements Serde {
   public <T> byte[] serialize(final T input) {
     Objects.requireNonNull(input);
 
-    if (AccountInfoRequest.class.isAssignableFrom(input.getClass())) {
-      return this.serializeAccountInfoRequest((AccountInfoRequest) input);
+    if (com.sappenin.fastpay.core.messages.AccountInfoRequest.class.isAssignableFrom(input.getClass())) {
+      com.sappenin.fastpay.core.bincode.AccountInfoRequest converted = BincodeConversions.convert(
+        (com.sappenin.fastpay.core.messages.AccountInfoRequest) input
+      );
+      return this.serializeAccountInfoRequest(converted);
     }
 //    else if (InterledgerRejectPacket.class.isAssignableFrom(this.getClass())) {
 //      rejectHandler.accept((InterledgerRejectPacket) this);
@@ -63,91 +43,24 @@ public class BincodeSerde implements Serde {
   public <T extends Object> T deserialize(final Class<T> clazz, final byte[] bytes) {
     Objects.requireNonNull(clazz);
     Objects.requireNonNull(bytes);
-
-    if (AccountInfoRequest.class.isAssignableFrom(clazz)) {
-      return (T) this.deserializeAccountInfoRequest(bytes);
-    }
-//    else if (InterledgerRejectPacket.class.isAssignableFrom(this.getClass())) {
-//      rejectHandler.accept((InterledgerRejectPacket) this);
-//    }
-    if (FastpayError.class.isAssignableFrom(clazz)) {
-      return (T) this.deserializeError(bytes);
-    } else {
-      throw new IllegalStateException(String.format("Unsupported bincode deserialization type: %s", clazz));
-    }
-  }
-
-  /**
-   * Convert a bincode-encoded error into the standard type used by fp4j.
-   *
-   * @param error An instance of {@link  com.sappenin.fastpay.core.bincode.FastPayError}.
-   *
-   * @return An instance of {@link FastpayError}.
-   */
-  // TODO: Unit test
-  public FastpayError fromBincode(final com.sappenin.fastpay.core.bincode.FastPayError error) {
-    Objects.requireNonNull(error);
-
-    if (InvalidSignature.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.invalidSignature(((InvalidSignature) error).error);
-    } else if (UnknownSigner.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.unknownSigner();
-    } else if (CertificateRequiresQuorum.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.certificateRequiresQuorum();
-    } else if (IncorrectTransferAmount.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.incorrectTransferAmount();
-    } else if (UnexpectedSequenceNumber.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.unexpectedSequenceNumber();
-    } else if (InsufficientFunding.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.insufficientFunding(((InsufficientFunding) error).current_balance.value.toString());
-    } else if (PreviousTransferMustBeConfirmedFirst.class.isAssignableFrom(error.getClass())) {
-//      TransferOrder transferOrder = TransferOrder.builder()
-//        .transfer(Transfer.builder()
-//
-//          .build())
-//        .build();
-      // TODO: deserialize transferOrder and inject into here.
-      return FastpayError.previousTransferMustBeConfirmedFirst(null);
-    } else if (ErrorWhileProcessingTransferOrder.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.errorWhileProcessingTransfer();
-    } else if (ErrorWhileRequestingCertificate.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.errorWhileRequestingCertificate();
-    } else if (MissingEalierConfirmations.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.missingEarlierConfirmation(((MissingEalierConfirmations) error).current_sequence_number);
-    } else if (UnexpectedTransactionIndex.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.unexpectedTransactionIndex();
-    } else if (CertificateNotfound.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.certificateNotFound();
-    } else if (UnknownSenderAccount.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.unknownSenderAccount();
-    } else if (CertificateAuthorityReuse.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.certificateAuthorityReuse();
-    } else if (InvalidSequenceNumber.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.invalidSequenceNumber();
-    } else if (SequenceOverflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.sequenceOverflow();
-    } else if (SequenceUnderflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.sequenceUnderflow();
-    } else if (AmountOverflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.amountOverflow();
-    } else if (AmountUnderflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.amountUnderflow();
-    } else if (BalanceOverflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.balanceOverflow();
-    } else if (BalanceUnderflow.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.balanceUnderflow();
-    } else if (WrongShard.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.wrongShard();
-    } else if (InvalidCrossShardUpdate.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.invalidCrossShardUpdated();
-    } else if (InvalidDecoding.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.invalidDecoding();
-    } else if (UnexpectedMessage.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.unexpeectedMessage();
-    } else if (ClientIoError.class.isAssignableFrom(error.getClass())) {
-      return FastpayError.clientIoError(((ClientIoError) error).error);
-    } else {
-      throw new RuntimeException("Unhandled bincode FastpayError type: " + error.getClass());
+    try {
+      if (com.sappenin.fastpay.core.messages.AccountInfoRequest.class.isAssignableFrom(clazz)) {
+        AccountInfoRequest bincode = this.deserializeAccountInfoRequest(bytes);
+        return (T) BincodeConversions.convert(bincode);
+      }
+      if (com.sappenin.fastpay.core.messages.AccountInfoResponse.class.isAssignableFrom(clazz)) {
+        AccountInfoResponse bincode = this.deserializeAccountInfoResponse(bytes);
+        return (T) BincodeConversions.convert(bincode);
+      }
+      if (FastpayError.class.isAssignableFrom(clazz)) {
+        return (T) BincodeConversions.convert(this.deserializeError(bytes));
+      } else {
+        throw new IllegalStateException(String.format("Unsupported bincode deserialization type: %s", clazz));
+      }
+    } catch (DeserializationError | ClassCastException e) {
+      FastPayError fastPayError = this.deserializeError(bytes);
+      FastpayError fastpayError = BincodeConversions.convert(fastPayError);
+      throw new FastpayException(fastpayError);
     }
   }
 
@@ -179,16 +92,19 @@ public class BincodeSerde implements Serde {
    *
    * @return A deserialized {@link AccountInfoRequest}.
    */
-  private AccountInfoRequest deserializeAccountInfoRequest(final byte[] accountInfoRequestBytes) {
+  private AccountInfoRequest deserializeAccountInfoRequest(final byte[] accountInfoRequestBytes)
+    throws DeserializationError {
     Objects.requireNonNull(accountInfoRequestBytes);
-    try {
-      final SerializedMessage serializedMessage = SerializedMessage.bincodeDeserialize(accountInfoRequestBytes);
-      final InfoReq infoReq = (InfoReq) serializedMessage;
-      final AccountInfoRequest accountInfoRequest = infoReq.value;
-      return accountInfoRequest;
-    } catch (DeserializationError e) {
-      throw new RuntimeException(e.getMessage(), e);
-    }
+    final SerializedMessage serializedMessage = SerializedMessage.bincodeDeserialize(accountInfoRequestBytes);
+    final InfoReq infoReq = (InfoReq) serializedMessage;
+    return infoReq.value;
+  }
+
+  private AccountInfoResponse deserializeAccountInfoResponse(byte[] bytes) throws DeserializationError {
+    Objects.requireNonNull(bytes);
+    final SerializedMessage serializedMessage = SerializedMessage.bincodeDeserialize(bytes);
+    final InfoResp infoResp = (InfoResp) serializedMessage;
+    return infoResp.value;
   }
 
   /**
@@ -214,14 +130,13 @@ public class BincodeSerde implements Serde {
    *
    * @return A deserialized {@link FastpayError}.
    */
-  private FastpayError deserializeError(final byte[] errorBytes) {
+  private FastPayError deserializeError(final byte[] errorBytes) {
     Objects.requireNonNull(errorBytes);
 
     try {
       final SerializedMessage serializedMessage = SerializedMessage.bincodeDeserialize(errorBytes);
       final Error error = (Error) serializedMessage;
-      final FastPayError fastPayError = error.value;
-      return this.fromBincode(fastPayError);
+      return error.value;
     } catch (DeserializationError e) {
       throw new RuntimeException(e.getMessage(), e);
     }

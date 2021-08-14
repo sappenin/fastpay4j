@@ -2,8 +2,6 @@ package com.sappenin.fastpay.core;
 
 import com.google.common.primitives.UnsignedInteger;
 import com.google.common.primitives.UnsignedLong;
-import com.sappenin.fastpay.core.authority.ImmutableAuthorityState;
-import com.sappenin.fastpay.core.authority.ImmutableAuthorityState.Builder;
 import com.sappenin.fastpay.core.keys.Ed25519PrivateKey;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Default;
@@ -20,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Value.Immutable
 public interface AuthorityState extends FastpayModel {
 
-  static Builder builder() {
+  static ImmutableAuthorityState.Builder builder() {
     return ImmutableAuthorityState.builder();
   }
 

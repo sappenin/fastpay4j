@@ -99,7 +99,7 @@ public class BincodeSerializerTest {
   private AccountInfoRequest createAccountInfoRequest1() {
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
 
-    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(
+    builder.sender = BincodeConversions.toEdPublicKeyBytes(
       Ed25519PublicKey.builder()
         .bytes(BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020"))
         .build());
@@ -112,7 +112,7 @@ public class BincodeSerializerTest {
   private AccountInfoRequest createAccountInfoRequest2() {
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
 
-    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(
+    builder.sender = BincodeConversions.toEdPublicKeyBytes(
       Ed25519PublicKey.builder()
         .bytes(BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020"))
         .build());

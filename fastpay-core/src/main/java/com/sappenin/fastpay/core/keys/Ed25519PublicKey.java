@@ -1,5 +1,6 @@
 package com.sappenin.fastpay.core.keys;
 
+import com.google.common.io.BaseEncoding;
 import org.immutables.value.Value;
 import org.immutables.value.Value.Derived;
 
@@ -20,7 +21,11 @@ public interface Ed25519PublicKey extends PublicKey {
   }
 
   static Ed25519PublicKey fromBase64(final String base64EncodedKey) {
-    return builder().bytes(Base64.getDecoder().decode(base64EncodedKey)).build();
+    return builder().bytes(BaseEncoding.base64().decode(base64EncodedKey)).build();
+  }
+
+  static Ed25519PublicKey fromBase16(final String base64EncodedKey) {
+    return builder().bytes(BaseEncoding.base16().decode(base64EncodedKey)).build();
   }
 
   /**

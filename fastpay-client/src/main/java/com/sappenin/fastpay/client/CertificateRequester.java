@@ -5,7 +5,7 @@ import com.sappenin.fastpay.core.Committee;
 import com.sappenin.fastpay.core.FastPayAddress;
 import com.sappenin.fastpay.core.SequenceNumber;
 import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
-import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
+import com.sappenin.fastpay.core.serde.BincodeConversions;
 import reactor.core.publisher.Mono;
 
 import java.security.NoSuchAlgorithmException;
@@ -50,8 +50,8 @@ public class CertificateRequester {
     Objects.requireNonNull(sequenceNumber);
 
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
-    builder.sender = BincodeSerdeUtils.toEdPublicKeyBytes(senderAddress.edPublicKey());
-    builder.request_sequence_number = Optional.of(BincodeSerdeUtils.toSerializableSequenceNumber(sequenceNumber));
+    builder.sender = BincodeConversions.toEdPublicKeyBytes(senderAddress.edPublicKey());
+    builder.request_sequence_number = Optional.of(BincodeConversions.toSerializableSequenceNumber(sequenceNumber));
     builder.request_received_transfers_excluding_first_nth = Optional.empty();
     final AccountInfoRequest request = builder.build();
 

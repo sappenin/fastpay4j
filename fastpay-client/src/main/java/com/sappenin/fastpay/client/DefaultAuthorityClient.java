@@ -3,18 +3,16 @@ package com.sappenin.fastpay.client;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Lists;
 import com.google.common.primitives.UnsignedLong;
+import com.sappenin.fastpay.core.AuthorityUtils;
 import com.sappenin.fastpay.core.CertifiedTransferOrder;
 import com.sappenin.fastpay.core.FastPayAddress;
+import com.sappenin.fastpay.core.FastpayException;
 import com.sappenin.fastpay.core.UserData;
-import com.sappenin.fastpay.core.AuthorityUtils;
-import com.sappenin.fastpay.core.bincode.AccountInfoRequest;
-import com.sappenin.fastpay.core.bincode.AccountInfoResponse;
-import com.sappenin.fastpay.core.bincode.FastPayError;
-import com.sappenin.fastpay.core.keys.Ed25519PublicKey;
+import com.sappenin.fastpay.core.messages.AccountInfoRequest;
+import com.sappenin.fastpay.core.messages.AccountInfoResponse;
 import com.sappenin.fastpay.core.messages.CetifiedTransferOrder;
 import com.sappenin.fastpay.core.messages.TransferOrder;
 import com.sappenin.fastpay.core.serde.BincodeSerde;
-import com.sappenin.fastpay.core.serde.BincodeSerdeUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelOption;
@@ -86,30 +84,27 @@ public class DefaultAuthorityClient implements AuthorityClient {
 
     final int shardNumber = AuthorityUtils.deriveShardNumber(
       clientNetworkOptions.numShards(),
-      FastPayAddress.builder()
-        .edPublicKey(Ed25519PublicKey.fromBase64(BincodeSerdeUtils.toHexString(accountInfoRequest.sender.value)))
-        .build()
+      accountInfoRequest.sender()
     );
 
     return Mono
       .just(serde.serialize(accountInfoRequest))
       .map(Unpooled::wrappedBuffer)
-      .map(requestByteBuf -> this.sendAndReceiveBytes(shardNumber, requestByteBuf))
+      .map(requestByteBuf -> {
+        final ByteBuf result = this.sendAndReceiveBytes(shardNumber, requestByteBuf);
+        if (result == null) {
+          throw new FastpayException("No result from Fastpay Server");
+        } else {
+          return result;
+        }
+      })
       .map(byteBuf -> {
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         byteBuf.release();
         return bytes;
       })
-      .map(bytes -> {
-        // TODO: Detect AccountInfoResponse vs FastpayError (see tuple comment below).
-        try {
-          return serde.deserialize(AccountInfoResponse.class, bytes);
-        }catch (Exception e){
-          // An exception was thrown, so try to deserialize a FastPayError.
-          FastPayError fastPayError = this.serde.deserialize(FastPayError.class, bytes);
-        }
-      });
+      .map(bytes -> serde.deserialize(AccountInfoResponse.class, bytes));
   }
 
   // TODO: Add a FastpayError to the response as a Tuple?
