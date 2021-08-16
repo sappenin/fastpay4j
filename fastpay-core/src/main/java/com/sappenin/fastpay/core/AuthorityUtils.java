@@ -1,7 +1,5 @@
 package com.sappenin.fastpay.core;
 
-import com.sappenin.fastpay.core.FastPayAddress;
-
 import java.nio.ByteBuffer;
 
 // TODO: Consider renaming to AuthorityStateUtils?

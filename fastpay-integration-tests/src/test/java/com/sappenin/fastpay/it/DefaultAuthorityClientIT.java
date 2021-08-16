@@ -63,7 +63,7 @@ public class DefaultAuthorityClientIT extends AbstractIT {
    * @deprecated Will go away once the Environment is wired up via Docker.
    */
   @Deprecated
-  private int PORT = 9101;
+  private int PORT = 9100; // Shard 0.
 
   private AuthorityClient authorityClient;
 
