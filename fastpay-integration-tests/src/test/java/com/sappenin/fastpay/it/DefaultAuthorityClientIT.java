@@ -37,11 +37,13 @@ public class DefaultAuthorityClientIT extends AbstractIT {
 
   // These correspond to the default accounts in Fastpay Rust.
   private FastPayAddress CLIENT_ADDRESS =
-    FastPayAddress.fromEd25519PublicKeyBase64("AzKoFE7qtEvQk+GHKt1YFJj28Pvk56rjV2T+fLowB+E=");
+    FastPayAddress.fromEd25519PublicKeyBase64("A2cEntd9tcAMLsgayRNl6owrMOI5gEFtw1VoDayGAHg=");
 
   private Ed25519PrivateKey CLIENT_PRIVATE_KEY = Ed25519PrivateKey.fromBase64(
-    "D5siqT/vgcwKGCgK5peCDKolzUcmOYbdqxNXcGJ8RaR27XiIi/bUjEdba007WG3O4QxAGVeuOwrumn7JIY7YCQ=="
+    "rcc3gEhS6sXf/0sic9DionRoh2D/hjmw0EhFJ9VpyBwDZwSe1321wAwuyBrJE2XqjCsw4jmAQW3DVWgNrIYAeA=="
   );
+
+  private FastPayAddress AUTHORITY_ONE = CLIENT_ADDRESS;
 
   private FastPayAddress AUTHORITY_TWO =
     FastPayAddress.fromEd25519PublicKeyBase64("AQButm+RAgo/LOJLdpMwHItLbjX7ZOIExN3PkQYHlHI=");
@@ -105,12 +107,17 @@ public class DefaultAuthorityClientIT extends AbstractIT {
   void getAccountInfo() {
     AccountInfoRequest request = AccountInfoRequest.builder()
       .sender(CLIENT_ADDRESS)
-      .requestSequenceNumber(Optional.of(SequenceNumber.of(UnsignedLong.ONE)))
+      //.requestSequenceNumber(Optional.of(SequenceNumber.of(UnsignedLong.valueOf(5L))))
+      //.requestReceivedTransfersExcludingFirstNth(10L)
       .build();
 
     this.authorityClient.getAccountInfo(request)
       .doOnSuccess($ -> {
-        assertThat($.balance()).isEqualTo(BigInteger.TEN);
+        assertThat($.balance()).isEqualTo(BigInteger.valueOf(100));
+        assertThat($.nextSequenceNumber().value()).isEqualTo(UnsignedLong.ZERO);
+        assertThat($.pendingConfirmations()).isEmpty();
+        assertThat($.requestedCertificate()).isEmpty();
+        assertThat($.requestedReceivedTransfers().size()).isEqualTo(0);
       })
       .doOnError(throwable -> {
         fail("Shouldn't have thrown an exception, but did", throwable);
@@ -128,6 +135,11 @@ public class DefaultAuthorityClientIT extends AbstractIT {
     final TreeMap<AuthorityName, UnsignedLong> votingRights = new TreeMap<>();
 
     // TODO: Does the client go into the voting rights maps?
+    votingRights.put(AuthorityName.builder()
+        .edPublicKey(AUTHORITY_ONE.edPublicKey())
+        .build(),
+      UnsignedLong.ONE
+    );
 
     votingRights.put(AuthorityName.builder()
         .edPublicKey(AUTHORITY_TWO.edPublicKey())
