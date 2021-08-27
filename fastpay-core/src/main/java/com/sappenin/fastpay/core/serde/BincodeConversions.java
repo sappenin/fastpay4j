@@ -54,8 +54,8 @@ public class BincodeConversions {
     Objects.requireNonNull(ed25519PublicKey);
 
     final List<@Unsigned Byte> value = new ArrayList<>(32);
-    for (int i = 0; i < ed25519PublicKey.bytes().length; i++) {
-      value.add(i, Byte.valueOf(ed25519PublicKey.bytes()[i]));
+    for (int i = 0; i < ed25519PublicKey.value().length; i++) {
+      value.add(i, Byte.valueOf(ed25519PublicKey.value()[i]));
     }
 
     return new EdPublicKeyBytes(value);

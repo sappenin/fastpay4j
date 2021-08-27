@@ -2,8 +2,9 @@ package com.sappenin.fastpay.server.spring.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sappenin.fastpay.server.settings.AuthoritySettings;
+import com.google.common.io.BaseEncoding;
 import com.sappenin.fastpay.core.NetworkProtocol;
+import com.sappenin.fastpay.server.settings.AuthoritySettings;
 import com.sappenin.fastpay.server.settings.ServerSettings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,10 +37,10 @@ public class ServerSettingsFromPropertyFileTest {
     assertThat(serverSettings.authority().host()).isEqualTo("0.0.0.0");
     assertThat(serverSettings.authority().basePort()).isEqualTo(9100);
     assertThat(serverSettings.authority().numShards()).isEqualTo(4);
-    assertThat(serverSettings.serverKey().asBase64())
+    assertThat(BaseEncoding.base64().encode(serverSettings.serverKey().value()))
       .isEqualTo("D5siqT/vgcwKGCgK5peCDKolzUcmOYbdqxNXcGJ8RaR27XiIi/bUjEdba007WG3O4QxAGVeuOwrumn7JIY7YCQ==");
     // Ensure that toString has private-key redacted.
-    assertThat(serverSettings.serverKey().toString()).isEqualTo("DefaultEd25519PrivateKey{}");
+    assertThat(serverSettings.serverKey().toString()).startsWith("com.sappenin.fastpay.core.keys.Ed25519PrivateKey");
 
     final AuthoritySettings committee0 = serverSettings.committees().get(0);
     assertThat(committee0.networkProtocol()).isEqualTo(NetworkProtocol.TCP);

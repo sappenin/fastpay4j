@@ -1,55 +1,71 @@
 package com.sappenin.fastpay.core.keys;
 
-import org.immutables.value.Value;
-import org.immutables.value.Value.Lazy;
-import org.immutables.value.Value.Redacted;
-
-import java.util.Base64;
+import java.util.Arrays;
+import java.util.Objects;
 
 /**
- * A private key.
+ * An Ed25519 private key.
  */
-public interface Ed25519PrivateKey extends PrivateKey {
+public class Ed25519PrivateKey implements PrivateKey {
+
+  private final byte[] value;
+  private boolean destroyed;
 
   /**
    * Instantiates a new builder.
    *
-   * @return A Builder.
+   * @return A {@link PrivateKey}.
    */
-  static ImmutableDefaultEd25519PrivateKey.Builder builder() {
-    return ImmutableDefaultEd25519PrivateKey.builder();
-  }
-
-  static Ed25519PrivateKey fromBase64(final String base64EncodedKey) {
-    return builder().bytes(Base64.getDecoder().decode(base64EncodedKey)).build();
+  public static Ed25519PrivateKey of(final byte[] value) {
+    return new Ed25519PrivateKey(value);
   }
 
   /**
-   * To satisfy immutables.
+   * Required-args Constructor.
+   *
+   * @param value A byte-array containing this key's value.
    */
-  @Value.Immutable
-  abstract class DefaultEd25519PrivateKey implements Ed25519PrivateKey {
-
-    /**
-     * The bytes of this private key.
-     *
-     * @return A byte array.
-     */
-    @Override
-    @Redacted
-    public abstract byte[] bytes();
-
-    @Override
-    @Lazy
-    @Redacted
-    public String asBase64() {
-      return Base64.getEncoder().encodeToString(this.bytes());
-    }
-
-    @Override
-    public int compareTo(PrivateKey privateKey) {
-      return privateKey.toString().compareTo(this.toString());
-    }
-
+  private Ed25519PrivateKey(final byte[] value) {
+    this.value = Objects.requireNonNull(value);
   }
+
+  @Override
+  public byte[] value() {
+    final byte[] dest = new byte[value.length];
+    System.arraycopy(value, 0, dest, 0, value.length);
+    return dest;
+  }
+
+  @Override
+  public final void destroy() {
+    if (!destroyed) {
+      Arrays.fill(value, (byte) 0);
+      this.destroyed = true;
+    }
+  }
+
+  @Override
+  public final boolean isDestroyed() {
+    return this.destroyed;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null || getClass() != obj.getClass()) {
+      return false;
+    }
+    Ed25519PrivateKey that = (Ed25519PrivateKey) obj;
+    return destroyed == that.isDestroyed() && Arrays.equals(value, that.value);
+  }
+
+  @Override
+  public int hashCode() {
+    int result = Objects.hash(destroyed);
+    result = 31 * result + Arrays.hashCode(value);
+    return result;
+  }
+
 }

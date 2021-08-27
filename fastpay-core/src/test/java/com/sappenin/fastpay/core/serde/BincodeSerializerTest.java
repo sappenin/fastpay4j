@@ -99,26 +99,23 @@ public class BincodeSerializerTest {
   private AccountInfoRequest createAccountInfoRequest1() {
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
 
-    builder.sender = BincodeConversions.toEdPublicKeyBytes(
-      Ed25519PublicKey.builder()
-        .bytes(BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020"))
-        .build());
+    builder.sender = BincodeConversions.toEdPublicKeyBytes(Ed25519PublicKey.of(
+      BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020")
+    ));
     builder.request_sequence_number = Optional.empty();
     builder.request_received_transfers_excluding_first_nth = Optional.empty();
-    final AccountInfoRequest request = builder.build();
-    return request;
+    return builder.build();
   }
 
   private AccountInfoRequest createAccountInfoRequest2() {
     final AccountInfoRequest.Builder builder = new AccountInfoRequest.Builder();
 
     builder.sender = BincodeConversions.toEdPublicKeyBytes(
-      Ed25519PublicKey.builder()
-        .bytes(BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020"))
-        .build());
-    builder.request_sequence_number = Optional.of(new SequenceNumber(Long.valueOf(129L)));
+      Ed25519PublicKey.of(
+        BaseEncoding.base16().decode("2020202020202020202020202020202020202020202020202020202020202020")
+      ));
+    builder.request_sequence_number = Optional.of(new SequenceNumber(129L));
     builder.request_received_transfers_excluding_first_nth = Optional.empty();
-    final AccountInfoRequest request = builder.build();
-    return request;
+    return builder.build();
   }
 }

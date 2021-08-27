@@ -3,6 +3,7 @@ package com.sappenin.fastpay.it;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.fail;
 
+import com.google.common.io.BaseEncoding;
 import com.google.common.primitives.UnsignedLong;
 import com.sappenin.fastpay.client.AuthorityClient;
 import com.sappenin.fastpay.client.AuthorityClientState;
@@ -39,11 +40,13 @@ public class DefaultAuthorityClientIT extends AbstractIT {
   private FastPayAddress CLIENT_ADDRESS =
     FastPayAddress.fromEd25519PublicKeyBase64("A2cEntd9tcAMLsgayRNl6owrMOI5gEFtw1VoDayGAHg=");
 
-  private Ed25519PrivateKey CLIENT_PRIVATE_KEY = Ed25519PrivateKey.fromBase64(
+  private Ed25519PrivateKey CLIENT_PRIVATE_KEY = Ed25519PrivateKey.of(BaseEncoding.base64().decode(
     "rcc3gEhS6sXf/0sic9DionRoh2D/hjmw0EhFJ9VpyBwDZwSe1321wAwuyBrJE2XqjCsw4jmAQW3DVWgNrIYAeA=="
-  );
+  ));
 
-  private FastPayAddress AUTHORITY_ONE = CLIENT_ADDRESS;
+  private FastPayAddress AUTHORITY_ONE = FastPayAddress.fromEd25519PublicKeyBase64(
+    "/urCnc/nUl34fwB9acGkvqggu6YzcFfjSjv0tHUOdxc"
+  );
 
   private FastPayAddress AUTHORITY_TWO =
     FastPayAddress.fromEd25519PublicKeyBase64("AQButm+RAgo/LOJLdpMwHItLbjX7ZOIExN3PkQYHlHI=");

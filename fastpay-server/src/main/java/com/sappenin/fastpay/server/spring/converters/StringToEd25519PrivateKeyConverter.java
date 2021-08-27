@@ -6,6 +6,8 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBindin
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 /**
  * A {@link Converter} for {@link Ed25519PrivateKey}.
  */
@@ -15,8 +17,7 @@ public class StringToEd25519PrivateKeyConverter implements Converter<String, Ed2
 
   @Override
   public Ed25519PrivateKey convert(final String s) {
-    return Ed25519PrivateKey.builder()
-      .bytes(Base64.decode(s))
-      .build();
+    Objects.requireNonNull(s);
+    return Ed25519PrivateKey.of(Base64.decode(s));
   }
 }

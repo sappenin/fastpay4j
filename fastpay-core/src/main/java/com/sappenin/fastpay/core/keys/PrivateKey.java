@@ -2,22 +2,17 @@ package com.sappenin.fastpay.core.keys;
 
 import com.sappenin.fastpay.core.FastpayModel;
 
+import javax.security.auth.Destroyable;
+
 /**
  * A private key.
  */
-public interface PrivateKey extends Comparable<PrivateKey>, FastpayModel {
+public interface PrivateKey extends Destroyable, FastpayModel {
 
   /**
-   * The bytes of this private key.
+   * Accessor for this key's value.
    *
-   * @return A byte array.
+   * @return A copy of this key's byte array.
    */
-  byte[] bytes();
-
-  /**
-   * Accessor for a Base64-encoded string representation of this key.
-   *
-   * @return
-   */
-  String asBase64();
+  byte[] value();
 }
