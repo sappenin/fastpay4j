@@ -26,7 +26,7 @@ public interface PublicKey<K> extends FastpayModel, Comparable<K> {
   }
 
   /**
-   * Accessor for a Base64-encoded string representation of this key.
+   * Accessor for a Base16-encoded string representation of this key.
    *
    * @return
    */
