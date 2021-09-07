@@ -1,6 +1,7 @@
 package com.sappenin.fastpay.core.keys;
 
 import com.google.common.io.BaseEncoding;
+import java.util.Base64;
 import org.bouncycastle.crypto.params.Ed25519PrivateKeyParameters;
 import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -131,5 +132,19 @@ public class KeyUtils {
       .publicKey(Ed25519PublicKey.of(publicKeyBytes))
       .privateKey(Ed25519PrivateKey.of(privateKeyBytes))
       .build();
+  }
+
+  /**
+   * Given private and public keys, transform it into serialized base64-encoded `SecretKey` from Fastpay.
+   */
+  public static String toFastPaySecretKeyB64(final Ed25519PrivateKey privateKey, final Ed25519PublicKey publicKey) {
+    final byte[] privateKeyBytes = privateKey.value();
+    final byte[] publicKeyBytes = publicKey.value();
+
+    final byte[] secretBytes = new byte[privateKeyBytes.length + publicKeyBytes.length];
+    System.arraycopy(privateKeyBytes, 0, secretBytes, 0, privateKeyBytes.length);
+    System.arraycopy(publicKeyBytes, 0, secretBytes, privateKeyBytes.length, publicKeyBytes.length);
+
+    return Base64.getEncoder().encodeToString(secretBytes);
   }
 }
