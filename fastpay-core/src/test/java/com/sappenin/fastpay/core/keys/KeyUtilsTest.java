@@ -8,6 +8,8 @@ import org.bouncycastle.crypto.params.Ed25519PublicKeyParameters;
 import org.junit.jupiter.api.Test;
 
 import javax.security.auth.DestroyFailedException;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
  * Unit tests for {@link KeyUtils}.
@@ -88,26 +90,16 @@ class KeyUtilsTest {
     assertThat(BaseEncoding.base16().encode(privateKey.value())).isEqualTo(DESTROYED_ED_PRIVATE_KEY_HEX);
   }
 
-  @Test
-  void fastPayPublicKey1ConversionTests() {
-    Ed25519PublicKeyParameters publicKeyParams = new Ed25519PublicKeyParameters(
-      BaseEncoding.base64().decode(FP_PUBLIC_KEY1_B64), 0);
+  @ParameterizedTest
+  @ValueSource(strings = {FP_PUBLIC_KEY1_B64, FP_PUBLIC_KEY2_B64})
+  void fastPayPublicKey1ConversionTests(final String key) {
+    final Ed25519PublicKeyParameters publicKeyParams = new Ed25519PublicKeyParameters(
+      BaseEncoding.base64().decode(key), 0);
     // To publicKey
-    Ed25519PublicKey publicKey = KeyUtils.toPublicKey(publicKeyParams);
+    final Ed25519PublicKey publicKey = KeyUtils.toPublicKey(publicKeyParams);
     // Convert back
-    Ed25519PublicKeyParameters converted = KeyUtils.toEd25519PublicKeyParameters(publicKey);
-    assertThat(BaseEncoding.base64().encode(converted.getEncoded())).isEqualTo(FP_PUBLIC_KEY1_B64);
-  }
-
-  @Test
-  void fastPayPublicKey2ConversionTests() {
-    Ed25519PublicKeyParameters publicKeyParams = new Ed25519PublicKeyParameters(
-      BaseEncoding.base64().decode(FP_PUBLIC_KEY2_B64), 0);
-    // To publicKey
-    Ed25519PublicKey publicKey = KeyUtils.toPublicKey(publicKeyParams);
-    // Convert back
-    Ed25519PublicKeyParameters converted = KeyUtils.toEd25519PublicKeyParameters(publicKey);
-    assertThat(BaseEncoding.base64().encode(converted.getEncoded())).isEqualTo(FP_PUBLIC_KEY2_B64);
+    final Ed25519PublicKeyParameters converted = KeyUtils.toEd25519PublicKeyParameters(publicKey);
+    assertThat(BaseEncoding.base64().encode(converted.getEncoded())).isEqualTo(key);
   }
 
   @Test
@@ -126,36 +118,20 @@ class KeyUtilsTest {
       .isEqualTo(BaseEncoding.base64().encode(expectedPublicKey.getEncoded()));
   }
 
-  @Test
-  void fromFastpaySecretKey1B64() {
-    byte[] secretBytes = BaseEncoding.base64().decode(FP_PRIVATE_KEY1_B64);
+  @ParameterizedTest
+  @ValueSource(strings = {FP_PRIVATE_KEY1_B64, FP_PRIVATE_KEY2_B64})
+  void fromFastPaySecretKey1B64(final String key) {
+    byte[] secretBytes = BaseEncoding.base64().decode(key);
     byte[] privateKeyBytes = new byte[32];
     System.arraycopy(secretBytes, 0, privateKeyBytes, 0, 32);
     byte[] publicKeyBytes = new byte[32];
     System.arraycopy(secretBytes, 32, publicKeyBytes, 0, 32);
 
-    Ed25519PublicKey expectedPublicKey = Ed25519PublicKey.of(publicKeyBytes);
-    Ed25519PrivateKey expectedPrivateKey = Ed25519PrivateKey.of(privateKeyBytes);
+    final Ed25519PublicKey expectedPublicKey = Ed25519PublicKey.of(publicKeyBytes);
+    final Ed25519PrivateKey expectedPrivateKey = Ed25519PrivateKey.of(privateKeyBytes);
 
-    KeyPair keyPair = KeyUtils.fromFastpaySecretKeyB64(FP_PRIVATE_KEY1_B64);
+    final KeyPair keyPair = KeyUtils.fromFastpaySecretKeyB64(key);
     assertThat(keyPair.publicKey()).isEqualTo(expectedPublicKey);
     assertThat(keyPair.privateKey()).isEqualTo(expectedPrivateKey);
   }
-
-  @Test
-  void fromFastpaySecretKey2B64() {
-    byte[] secretBytes = BaseEncoding.base64().decode(FP_PRIVATE_KEY2_B64);
-    byte[] privateKeyBytes = new byte[32];
-    System.arraycopy(secretBytes, 0, privateKeyBytes, 0, 32);
-    byte[] publicKeyBytes = new byte[32];
-    System.arraycopy(secretBytes, 32, publicKeyBytes, 0, 32);
-
-    Ed25519PublicKey expectedPublicKey = Ed25519PublicKey.of(publicKeyBytes);
-    Ed25519PrivateKey expectedPrivateKey = Ed25519PrivateKey.of(privateKeyBytes);
-
-    KeyPair keyPair = KeyUtils.fromFastpaySecretKeyB64(FP_PRIVATE_KEY2_B64);
-    assertThat(keyPair.publicKey()).isEqualTo(expectedPublicKey);
-    assertThat(keyPair.privateKey()).isEqualTo(expectedPrivateKey);
-  }
-
 }
