@@ -15,6 +15,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>info.picocli</groupId>
+      <artifactId>picocli</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.sappenin.fastpay</groupId>
       <artifactId>fastpay-client</artifactId>
     </dependency>
